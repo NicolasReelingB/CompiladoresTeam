@@ -9,13 +9,16 @@ namespace token {
         CONDITIONAL,
         CLOSING,
         DATA,
+        DECLARE,
         LOGICAL,
         IDENTIFIER,
         INPUT,
         OUTPUT,
         OPENING,
+        RETURN,
+        SEPARATOR,
         VOID,
-        WHITESPACE
+        WHITESPACE,
     };
 
     std::map<Type, std::string> typeToStr = {
@@ -24,72 +27,103 @@ namespace token {
         {CONDITIONAL, "CONDITIONAL"},
         {CLOSING, "CLOSING"},
         {DATA, "DATA"},
+        {DECLARE, "DECLARE"},
         {LOGICAL, "LOGICAL"},
         {IDENTIFIER, "IDENTIFIER"},
         {INPUT, "INPUT"},
         {OUTPUT, "OUTPUT"},
         {OPENING, "OPENING"},
         {VOID, "VOID"},
-        {WHITESPACE, "WHITESPACE"}
+        {WHITESPACE, "WHITESPACE"},
+        {RETURN, "RETURN"},
+        {SEPARATOR, "SEPARATOR"}
     };
 
     struct MapToCode {
         std::map<std::string, std::string> mapToCode;
         token::Type type;
 
-        MapToCode(std::map<std::string, std::string> mapToCode, token::Type type) : 
-            mapToCode(mapToCode), 
-            type(type) 
-            {}
+        MapToCode(std::map<std::string, std::string> mapToCode, token::Type type) :
+            mapToCode(mapToCode),
+            type(type)
+        {}
     };
 
     std::map<std::string, std::string> arithmetic = {
-        {"9966CC", "+"},
-        {"FF00CC", "-"},
-        {"00FFCC", "*"},
-        {"330033", "/"},
-        {"666600", "%"}
+        {"+", "9966CC"},
+        {"-", "FF00CC"},
+        {"*", "00FFCC"},
+        {"/", "330033"},
+        {"%", "666600"}
     };
 
     std::map<std::string, std::string> logical = {
-        {"CC33FF", "&&"}
+        {"&&", "CC33FF"},
+        {"||", "00CCFF"},
+        {"!", "FF9900"},
+        {"==", "FF6600"},
+        {"!=", "33CC33"},
+        {"<", "FF3366"},
+        {">", "6699FF"},
+        {"<=", "FFCC00"},
+        {">=", "993399"}
     };
 
     std::map<std::string, std::string> assignment = {
-        {"FFFF66", "="}
+        {"=", "FFFF66"}
     };
 
     std::map<std::string, std::string> conditional = {
-        {"CC00CC", "for"},
-        {"CCCC00", "while"},
-        {"00CCCC", "if"},
-        {"CC3300", "else"}
+        {"for", "CC00CC"},
+        {"while", "CCCC00"},
+        {"if", "00CCCC"},
+        {"else", "CC3300"}
     };
 
     std::map<std::string, std::string> whitespace = {
-        {"FFFFFF", " "}
+        {" ", "FFFFFF"}
     };
 
     std::map<std::string, std::string> output = {
-        {"99FF00", "print"}
+        {"print", "99FF00"},
+        {"cout", "99FF00"},
+        {"<<", ""}
     };
 
     std::map<std::string, std::string> input = {
-        {"000000", "void"}
+        {"read", ""},
+        {"cin", ""},
+        {">>", ""}
     };
 
-    std::map<std::string, std::string> data = {
-        {"FF0000", "char"},
-        {"0000FF", "int"},
-        {"00FF00", "bool"},
-        {"00FFFF", "array"},
-        {"FFFF00", "string"},
-        {"FF00FF", "function"},
-        {"FF00FF", "matrix"},
-        {"9999FF", "float"},
+    std::map<std::string, std::string> isReturn = {
+        {"return", ""}
     };
 
-    std::vector<MapToCode> keyword = {
+    std::map<std::string, std::string> separator = {
+        {";", ""},
+        {",", ""},
+        {":", ""}
+    };
+
+    std::map<std::string, std::string> isVoid = {
+        {"void", "000000"}
+    };
+
+    std::map<std::string, std::string> declare = {
+        {"char", "FF0000"},
+        {"int", "0000FF"},
+        {"bool", "00FF00"},
+        {"array", "00FFFF"},
+        {"string", "FFFF00"},
+        {"function", "FF00FF"},
+        {"matrix", "FF00FF"},
+        {"float", "9999FF"},
+        {"double", ""},
+        {"vector", ""}
+    };
+
+    std::vector<MapToCode> keywordsToCode = {
         MapToCode(arithmetic, ARITHMETIC),
         MapToCode(logical, LOGICAL),
         MapToCode(assignment, ASSIGNMENT),
@@ -97,7 +131,10 @@ namespace token {
         MapToCode(whitespace, WHITESPACE),
         MapToCode(output, OUTPUT),
         MapToCode(input, INPUT),
-        MapToCode(data, DATA)
+        MapToCode(declare, DECLARE), 
+        MapToCode(isReturn, RETURN),
+        MapToCode(separator, SEPARATOR),
+        MapToCode(isVoid, VOID)
     };
 };
 
