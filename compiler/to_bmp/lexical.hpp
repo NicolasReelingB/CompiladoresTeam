@@ -35,8 +35,18 @@ struct Lexical {
         throw std::invalid_argument("Invalid closing " + lineMsg + colMsg);
     }
 
+    void throwInvChar(int line, int column) {
+        std::string lineMsg = "line: " + std::to_string(line) + ',';
+        std::string colMsg = " column: " + std::to_string(column);
+        throw std::invalid_argument("Invalid character " + lineMsg + colMsg);
+    }
+
     bool charofId(char c) {
         return !std::isspace(c) && (std::isalnum(c) || c == '_');
+    }
+
+    bool charOrStr(char c) {
+        return c == '"' || c == '\'';
     }
 
     struct Delim {
@@ -68,11 +78,6 @@ struct Lexical {
         int len = line.size();
         for (int col = 1; col < len; col++) {
             char c = line[col];
-            if (c < 0 || c > 127) {
-                std::string lineMsg = "line: " + std::to_string(numLine) + ',';
-                std::string colMsg = " column: " + std::to_string(col);
-                throw std::invalid_argument("Invalid character at " + lineMsg + colMsg);
-            }
             
             str += c;
 
@@ -105,7 +110,7 @@ struct Lexical {
             }
 
             bool isId = (col == len - 1) || (!charofId(nxt) || std::isdigit(nxt));
-            if (isId && charofId(str[0])) {
+            if (isId && charofId(str[0]) && !std::isdigit(str[0])) {
                 for (int i = 0; i < str.size(); i++) {
                     int pos = col - (int) str.size() + i;
                     std::string value = std::string(1, str[i]);
@@ -114,18 +119,25 @@ struct Lexical {
                     tokens.push_back(Token(token::IDENTIFIER, value, color, numLine, pos));
                 }
             }
-            else if (std::isdigit(c) && (col == len - 1 || std::isdigit(nxt))) {
+            else if (std::isdigit(c) && (col == len - 1 || !std::isdigit(nxt))) {
                 std::string color = intToHex(std::stoi(str));
                 int pos = col - (int) str.size() + 1;
                 tokens.push_back(Token(token::DATA, str, color, numLine, pos));
             }
-            else if (c == '"' || c == '\'') {
+            else if (charOrStr(c)) {
                 if (!delim.empty() && delim.back().c == c) {
                     delim.pop_back();
                 }
                 else {
                     delim.push_back(Delim(c, numLine, col));
                     continue;
+                }
+
+                char esc = str[2];
+                bool isEsc = str.size() == 4 && str[1] == '\\';
+                isEsc &= esc == 'n' || esc == 't' || esc == 'r' || esc == 'v' || esc == 'f';
+                if (c == '\'' && (int) str.size() > 3 && !isEsc) {
+                    throwInvChar(numLine, col);
                 }
 
                 for (int i = 0; i < str.size(); i++) {
@@ -136,7 +148,7 @@ struct Lexical {
                     tokens.push_back(Token(token::DATA, value, color, numLine, pos));
                 }
             }
-            else if ((c == '(' || c == '{' || c == '[')){
+            else if ((c == '(' || c == '{' || c == '[')) {
                 delim.push_back(Delim(c, numLine, col));
                 tokens.push_back(Token(token::OPENING, std::string(1, c), charToHex(c), numLine, col));
             }
@@ -149,6 +161,11 @@ struct Lexical {
                 tokens.push_back(Token(token::CLOSING, std::string(1, c), charToHex(c), numLine, col));
             }
             else {
+                bool notCharOrStr = col == len - 1 && (delim.empty() || !charOrStr(delim.back().c));
+                if (c < 0 || c > 127 || notCharOrStr) {
+                    throwInvChar(numLine, col);
+                }
+                
                 continue;
             }
 
