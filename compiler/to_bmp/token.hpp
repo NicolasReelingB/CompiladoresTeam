@@ -9,6 +9,7 @@ namespace token {
         CONDITIONAL,
         CLOSING,
         DATA,
+        DECLARE,
         LOGICAL,
         IDENTIFIER,
         INPUT,
@@ -26,6 +27,7 @@ namespace token {
         {CONDITIONAL, "CONDITIONAL"},
         {CLOSING, "CLOSING"},
         {DATA, "DATA"},
+        {DECLARE, "DECLARE"},
         {LOGICAL, "LOGICAL"},
         {IDENTIFIER, "IDENTIFIER"},
         {INPUT, "INPUT"},
@@ -108,7 +110,7 @@ namespace token {
         {"void", "000000"}
     };
 
-    std::map<std::string, std::string> data = {
+    std::map<std::string, std::string> declare = {
         {"char", "FF0000"},
         {"int", "0000FF"},
         {"bool", "00FF00"},
@@ -121,7 +123,7 @@ namespace token {
         {"vector", ""}
     };
 
-    std::vector<MapToHex> keyword = {
+    std::vector<MapToHex> keywordsToHex = {
         MapToHex(arithmetic, ARITHMETIC),
         MapToHex(logical, LOGICAL),
         MapToHex(assignment, ASSIGNMENT),
@@ -129,7 +131,7 @@ namespace token {
         MapToHex(whitespace, WHITESPACE),
         MapToHex(output, OUTPUT),
         MapToHex(input, INPUT),
-        MapToHex(data, DATA),
+        MapToHex(declare, DECLARE),
         MapToHex(isReturn, RETURN),
         MapToHex(separator, SEPARATOR),
         MapToHex(isVoid, VOID)
