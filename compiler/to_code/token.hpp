@@ -103,7 +103,6 @@ namespace token {
     std::map<std::string, std::string> separator = {
         {";", ""},
         {",", ""},
-        {":", ""}
     };
 
     std::map<std::string, std::string> isVoid = {
@@ -118,8 +117,7 @@ namespace token {
         {"string", "FFFF00"},
         {"function", "FF00FF"},
         {"matrix", "FF00FF"},
-        {"float", "9999FF"},
-        {"double", ""},
+        {"double", "9999FF"},
         {"vector", ""}
     };
 

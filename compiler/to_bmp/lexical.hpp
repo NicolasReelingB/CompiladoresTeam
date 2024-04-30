@@ -10,6 +10,28 @@
 #include "token.hpp"
 
 struct Lexical {
+    struct Delim {
+        char c;
+        int line;
+        int col;
+
+        Delim(char c, int line, int col) : c(c), line(line), col(col) {}
+
+        bool match(char &c) {
+            if (this->c == '(' && c == ')') {
+                return true;
+            }
+            if (this->c == '{' && c == '}') {
+                return true;
+            }
+            if (this->c == '[' && c == ']') {
+                return true;
+            }
+
+            return false;
+        }
+    };
+
     std::vector<Token> tokens;
     std::map<std::string, std::pair<std::string, token::Type>> keyword;
     
@@ -41,135 +63,164 @@ struct Lexical {
         throw std::invalid_argument("Invalid character " + lineMsg + colMsg);
     }
 
-    bool charofId(char c) {
-        return !std::isspace(c) && (std::isalnum(c) || c == '_');
-    }
+    void pushTokenStr(std::string &str, int numLine, int col, int &s) {
+        for (int i = 0; i < (int) str.size(); i++) {
+            int pos = col - (int) str.size() + i;
+            std::string value = std::string(1, str[i]);
+            std::string color = charToHex(str[i]);
 
-    bool charOrStr(char c) {
-        return c == '"' || c == '\'';
-    }
-
-    struct Delim {
-        char c;
-        int line;
-        int col;
-
-        Delim(char c, int line, int col) : c(c), line(line), col(col) {}
-
-        bool match(char &c) {
-            if (this->c == '(' && c == ')') {
-                return true;
-            }
-            if (this->c == '{' && c == '}') {
-                return true;
-            }
-            if (this->c == '[' && c == ']') {
-                return true;
-            }
-
-            return false;
+            tokens.push_back(Token(token::DATA, value, color, numLine, pos));
         }
-    };
 
-    void tokenizeLine(std::string& line, int numLine, std::vector<Delim>& delim) {
+        s = 0;
+        str.clear();
+    }
+
+    void checkValInt(std::string &str, int numLine, int col, int len) {
+        if (len > 5 || std::stoi(str) >= (1 << 16)) {
+            std::string num = std::to_string((1 << 16) - 1);
+            std::string msg = "Invalid number, maximum is " + num + " at ";
+            std::string lineMsg = "line: " + std::to_string(numLine) + ',';
+            std::string colMsg = " column: " + std::to_string(col - len + 1);
+            
+            throw std::invalid_argument(msg + lineMsg + colMsg);
+        }
+    }
+
+    void tokenizeLine(std::string& line, int numLine, std::vector<Delim>& delim, int &s) {
         line = "$" + line;
         std::string str = "";
         
-        int len = line.size();
-        for (int col = 1; col < len; col++) {
+        int lenLine = line.size();
+        std::string dec = "";
+        for (int col = 1; col < lenLine; col++) {
             char c = line[col];
-            
+            char nxt = line[std::min(col + 1, lenLine - 1)];
+
             str += c;
-
-            bool isString = !delim.empty() && (delim.back().c == '\'' || delim.back().c == '"');
-            if (isString && str[0] != c) {
-                continue;
-            }
-
-            char nxt = line[std::min(col + 1, len - 1)];
-            if (c == '<' || c == '>' || c == '=' || c == '!' || c == '&' || c == '|') {
-                if (col != len - 1) {
-                    if (nxt == '=') {
-                        continue;
-                    }
-                    if (c == '<' && nxt == '<') {
-                        continue;
-                    }
-                    if (c == '>' && nxt == '>') {
-                        continue;
-                    }
+            int lenStr = str.size();
+            if (s == 0) {
+                if (std::isdigit(c)) {
+                    s = 2;
                 }
-            }
-            
-            if ((c == ' ' || col == len || !charofId(nxt)) && keyword.count(str)) {
-                auto &[color, type] = keyword[str];
-                tokens.push_back(Token(type, str, color, numLine, col - (int) str.size() + 1));
-
-                str.clear();
-                continue;
-            }
-
-            bool isId = (col == len - 1) || (!charofId(nxt) || std::isdigit(nxt));
-            if (isId && charofId(str[0]) && !std::isdigit(str[0])) {
-                for (int i = 0; i < str.size(); i++) {
-                    int pos = col - (int) str.size() + i;
-                    std::string value = std::string(1, str[i]);
-                    std::string color = charToHex(str[i]);
-
-                    tokens.push_back(Token(token::IDENTIFIER, value, color, numLine, pos));
+                else if (c == '"') {
+                    s = 4;
                 }
-            }
-            else if (std::isdigit(c) && (col == len - 1 || !std::isdigit(nxt))) {
-                std::string color = intToHex(std::stoi(str));
-                int pos = col - (int) str.size() + 1;
-                tokens.push_back(Token(token::DATA, str, color, numLine, pos));
-            }
-            else if (charOrStr(c)) {
-                if (!delim.empty() && delim.back().c == c) {
+                else if (c == '\'') {
+                    s = 5;
+                }
+                else if (c == '(' || c == '{' || c == '[') {
+                    delim.push_back(Delim(c, numLine, col));
+                    tokens.push_back(Token(token::OPENING, std::string(1, c), charToHex(c), numLine, col));
+                }
+                else if (c == ')' || c == '}' || c == ']') {
+                    if (delim.empty() || !delim.back().match(c)) {
+                        throwBadClosing(numLine, col);
+                    }
+
                     delim.pop_back();
+                    tokens.push_back(Token(token::CLOSING, std::string(1, c), charToHex(c), numLine, col));
+                }
+                else if (c > -1 && c < 128) {
+                    s = 1;
                 }
                 else {
-                    delim.push_back(Delim(c, numLine, col));
-                    continue;
-                }
-
-                char esc = str[2];
-                bool isEsc = str.size() == 4 && str[1] == '\\';
-                isEsc &= esc == 'n' || esc == 't' || esc == 'r' || esc == 'v' || esc == 'f';
-                if (c == '\'' && (int) str.size() > 3 && !isEsc) {
                     throwInvChar(numLine, col);
                 }
 
-                for (int i = 0; i < str.size(); i++) {
-                    int pos = col - (int) str.size() + i;
-                    std::string value = std::string(1, str[i]);
-                    std::string color = charToHex(str[i]);
+                if (s > 0) {
+                    --col;
+                }
+                str.clear();
+            }
+            else if (s == 1) { // keyword or identifier
+                if (c == ' ' || col == lenLine - 1 || !(std::isalnum(nxt) || nxt == '_')) {
+                    if ((c == '<' || c == '>') && col != lenLine - 1 && nxt == c) {
+                        continue;
+                    }   
+                    
+                    if (keyword.count(str)) {
+                        auto &[color, type] = keyword[str];
+                        int pos = col - lenStr + 1;
 
-                    tokens.push_back(Token(token::DATA, value, color, numLine, pos));
+                        tokens.push_back(Token(type, str, color, numLine, pos));
+                    }
+                    else {
+                        for (int i = 0; i < lenStr; i++) {
+                            token::Type type = token::IDENTIFIER;
+                            int pos = col - lenStr + i;
+                            std::string value = std::string(1, str[i]);
+                            std::string color = charToHex(str[i]);
+
+                            tokens.push_back(Token(type, value, color, numLine, pos));
+                        }
+                    }
+                    
+                    s = 0;
+                    str.clear();
+                    continue;   
                 }
             }
-            else if ((c == '(' || c == '{' || c == '[')) {
-                delim.push_back(Delim(c, numLine, col));
-                tokens.push_back(Token(token::OPENING, std::string(1, c), charToHex(c), numLine, col));
-            }
-            else if (c == ')' || c == '}' || c == ']') {
-                if (delim.empty() || !delim.back().match(c)) {
-                    throwBadClosing(numLine, col);
+            else if (s == 2) { // int
+                if (lenStr == 2 && str[0] == '0' && str[1] == '0') {
+                    str.pop_back();
                 }
 
-                delim.pop_back();
-                tokens.push_back(Token(token::CLOSING, std::string(1, c), charToHex(c), numLine, col));
-            }
-            else {
-                bool notCharOrStr = col == len - 1 && (delim.empty() || !charOrStr(delim.back().c));
-                if (c < 0 || c > 127 || notCharOrStr) {
-                    throwInvChar(numLine, col);
+                checkValInt(str, numLine, col, lenStr);
+                if (c == '.') {
+                    if (col != lenLine - 1 && !std::isdigit(nxt)) {
+                        throwInvChar(numLine, col);
+                    }
+
+                    s = 3;
                 }
-                
-                continue;
+                else if (col == lenLine - 1 || !std::isdigit(nxt)) {
+                    std::string color = intToHex(std::stoi(str));
+                    int pos = col - lenStr + 1;
+                    tokens.push_back(Token(token::DATA, str, color, numLine, pos));
+
+                    s = 0;
+                    str.clear();
+                }
+            }
+            else if (s == 3) { // double
+                dec += c;
+
+                if ((int) dec.size() > 8) {
+                    std::string maxMsg = "Maximum is 8 digits, invalid decimal at ";
+                    std::string msgLine = "line: " + std::to_string(numLine) + ", ";
+                    std::string msgCol = "column: " + std::to_string(col);
+
+                    throw std::invalid_argument(maxMsg + msgLine + msgCol);
+                }
+
+                if (col == lenLine - 1 || !std::isdigit(nxt)) {
+                    std::string color = intToHex(std::stoi(str));
+                    int pos = col - lenStr + 1;
+                    tokens.push_back(Token(token::DATA, str, color, numLine, pos));
+
+                    s = 0;
+                    str.clear();
+                    dec.clear();
+                }
+            }
+            else if (s == 4) { // string
+                if (c == '"' && lenStr != 1) {
+                    pushTokenStr(str, numLine, col, s);
+                }
+            }
+            else if (s == 5) { // char
+                if (c == '\'' && lenStr != 1) {
+                    char e = str[std::min(2, lenStr - 1)];
+                    bool isEsc = e == 'n' || e == 't' || e == 'r' || e == 'v' || e == 'f';
+                    if (lenStr > 4 || lenStr == 2 || (lenStr == 4 && !isEsc)) {
+                        throwInvChar(numLine, col);
+                    }
+
+                    pushTokenStr(str, numLine, col, s);
+                }
             }
 
-            str.clear();
         }
     }
 
@@ -185,18 +236,23 @@ struct Lexical {
         std::string line;
         int numLine = 0;
 
+
         std::vector<Delim> delim;
+        int state = 0;
         while (std::getline(file, line)) {
             numLine += 1;
             std::cout << numLine << ' ' << line << '\n';
             
-            tokenizeLine(line, numLine, delim);
+            tokenizeLine(line, numLine, delim, state);
         }
 
         file.close();
 
         if (!delim.empty()) {
             throwBadClosing(delim.back().line, delim.back().col);
+        }
+        if (state != 0) {
+            throw std::invalid_argument("Invalid end of file");
         }
 
         std::cout << '\n';
