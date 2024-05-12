@@ -4,6 +4,7 @@
 
 namespace token {
     enum Type {
+        UNDEFINED = 0,
         ARITHMETIC,
         ARRAYOP,
         ASSIGNMENT,
@@ -12,12 +13,14 @@ namespace token {
         DATA,
         DATATYPE,
         DELIMITATION,
-        FUNCTION,
-        LOGICAL,
-        LOOP,
         IDENTIFIER,
         INPUT,
+        LOGICAL,
+        LOOP,
+        OP,
         OUTPUT,
+        RETURN,
+        SUBTYPE,
         VOID,
         WHITESPACE
     };
@@ -31,17 +34,33 @@ namespace token {
         {DATA, "DATA"},
         {DATATYPE, "DATATYPE"},
         {DELIMITATION, "DELIMITATION"},
-        {FUNCTION, "FUNCTION"},
         {LOGICAL, "LOGICAL"},
         {LOOP, "LOOP"},
         {IDENTIFIER, "IDENTIFIER"},
         {INPUT, "INPUT"},
+        {OP, "OP"},
         {OUTPUT, "OUTPUT"},
+        {RETURN, "RETURN"},
+        {SUBTYPE, "SUBTYPE"},
         {VOID, "VOID"},
-        {WHITESPACE, "WHITESPACE"},
+        {WHITESPACE, "WHITESPACE"}
+    };
+
+    enum SubType {
+        UNDEFINED = 100,
+        ARRAY,
+        FUNC,
+        FUNCTION
+    };
+
+    std::map<SubType, std::string> subTypeToStr = {
+        {ARRAY, "ARRAY"},
+        {FUNC, "FUNC"},
+        {FUNCTION, "FUNCTION"}
     };
 
     enum DataType {
+        UNDEFINED = 200,
         BOOL,
         CHAR,
         STRING,
@@ -52,7 +71,8 @@ namespace token {
         {BOOL, "BOOL"},
         {CHAR, "CHAR"},
         {STRING, "STRING"},
-        {NUMBER, "NUMBER"}
+        {NUMBER, "NUMBER"},
+        {UNDEFINED, "UNDEFINED"}
     };
 
     struct MapToHex {
@@ -71,10 +91,6 @@ namespace token {
         {"*", "FFAA77"},
         {"/", "FFAA44"},
         {"%", "FF8811"}
-    };
-
-    std::map<std::string, std::string> arrayOp = {
-        {"_", "ABCD0E"}
     };
 
     std::map<std::string, std::string> assignment = {
@@ -117,7 +133,7 @@ namespace token {
         {";", "FF5353"}
     };
 
-    std::map<std::string, std::string> function = {
+    std::map<std::string, std::string> isReturn = {
         {"return", "BC7FFF"}
     };
 
@@ -162,35 +178,49 @@ namespace token {
         {"print", "2024AB"}
     };
 
+    std::map<std::string, std::string> op = {
+        {"_", "ABCD0E"}
+    };
+
+    std::map<std::string, std::string> subTypes = {
+        {"array", "00FFFF"},
+        {"func", "FF00FF"},
+        {"function", "FF00FF"}
+    };
+
     std::map<std::string, std::string> whitespace = {
         {" ", "FFFFFF"}
     };
 
     std::vector<MapToHex> keywordsToHex = {
         MapToHex(arithmetic, ARITHMETIC),
-        MapToHex(arrayOp, ARRAYOP),
         MapToHex(assignment, ASSIGNMENT),
         MapToHex(boolean, DATA),
         MapToHex(conditional, CONDITIONAL),
         MapToHex(comparison, COMPARISON),
         MapToHex(dataType, DATATYPE),
         MapToHex(delimitation, DELIMITATION),
-        MapToHex(function, FUNCTION),
         MapToHex(input, INPUT),
+        MapToHex(isReturn, RETURN),
         MapToHex(isVoid, VOID),
         MapToHex(loop, LOOP),
         MapToHex(logical, LOGICAL),
         MapToHex(number, DATA),
+        MapToHex(op, OP),
         MapToHex(output, OUTPUT),
+        MapToHex(subTypes, SUBTYPE),
         MapToHex(whitespace, WHITESPACE)
     };
 };
 
 struct Token {
-    token::Type type;
-    token::DataType dataType;
+    token::Type type = token::Type::UNDEFINED;
+    token::SubType subType = token::SubType::UNDEFINED;
+    token::DataType dataType = token::DataType::UNDEFINED;
+
     std::string value;
     std::string color;
+
     int line;
     int column;
 

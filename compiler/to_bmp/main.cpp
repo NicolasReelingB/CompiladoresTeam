@@ -9,6 +9,5 @@ int main() {
     // compilerToBmp.codeToBitmap("input/fibonacci_nonrecursive.txt");
     // compilerToBmp.codeToBitmap("input/helloworld.txt");
     
-
     return 0;
 }

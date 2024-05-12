@@ -11,25 +11,6 @@
 #include "token.hpp"
 
 struct Lexical {
-    struct Delim {
-        char c;
-        int line;
-        int col;
-
-        Delim(char c, int line, int col) : c(c), line(line), col(col) {}
-
-        bool match(char &c) {
-            if (this->c == '(' && c == ')') {
-                return true;
-            }
-            if (this->c == '~' && c == '~') {
-                return true;
-            }
-
-            return false;
-        }
-    };
-
     std::vector<Token> tokens;
     std::map<std::string, std::pair<std::string, token::Type>> keyword;
     
@@ -200,7 +181,7 @@ struct Lexical {
     std::vector<Token>& tokenize(std::string& path) {
         for (int i = 0; i < token::keywordsToHex.size(); i++) {
             std::map<std::string, std::string> &m = token::keywordsToHex[i].mapToHex;
-            for (auto &[key, color] : m) {
+            for (const auto &[key, color] : m) {
                 keyword[key] = std::make_pair(color, token::keywordsToHex[i].type);
             }
         }

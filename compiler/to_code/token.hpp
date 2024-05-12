@@ -42,17 +42,25 @@ namespace token {
     };
 
     enum DataType {
+        ARRAY,
         BOOL,
         CHAR,
+        FUNC,
+        FUNCTION,
         STRING,
-        NUMBER
+        NUMBER,
+        UNDEFINED
     };
 
     std::map<DataType, std::string> dataTypeToStr = {
+        {ARRAY, "ARRAY"},
         {BOOL, "BOOL"},
         {CHAR, "CHAR"},
+        {FUNC, "FUNC"},
+        {FUNCTION, "FUNCTION"},
         {STRING, "STRING"},
-        {NUMBER, "NUMBER"}
+        {NUMBER, "NUMBER"},
+        {UNDEFINED, "UNDEFINED"}
     };
 
     struct MapToCode {

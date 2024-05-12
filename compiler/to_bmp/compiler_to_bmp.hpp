@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 
+#include "delim.hpp"
 #include "lexical.hpp"
 #include "semantical.hpp"
 #include "syntactical.hpp"
@@ -14,9 +15,12 @@ struct CompilerToBmp {
     Syntactical syntactical;
     Semantical semantical;
 
-    void codeToBitmap(std::string input) {
-        std::vector<Token> tokens = lexical.tokenize(input);
-        syntactical.processTokens(tokens);
+    void codeToBitmap(std::string inp) {
+        std::vector<Token>& tokens = lexical.tokenize(inp);
+            syntactical.tokens = tokens;
 
+            inp.substr(0, inp.find('/'));
+            std::string out = "output/" + inp.substr(0, inp.find_last_of('.')) + ".cpp";
+            syntactical.parse(out);
     }
 };
