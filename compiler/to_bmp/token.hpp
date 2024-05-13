@@ -4,7 +4,7 @@
 
 namespace token {
     enum Type {
-        UNDEFINED = 0,
+        UNDEFINEDT = 0,
         ARITHMETIC,
         ARRAYOP,
         ASSIGNMENT,
@@ -47,7 +47,7 @@ namespace token {
     };
 
     enum SubType {
-        UNDEFINED = 100,
+        UNDEFINEDST = 100,
         ARRAY,
         FUNC,
         FUNCTION
@@ -60,7 +60,7 @@ namespace token {
     };
 
     enum DataType {
-        UNDEFINED = 200,
+        UNDEFINEDDT = 200,
         BOOL,
         CHAR,
         STRING,
@@ -72,7 +72,7 @@ namespace token {
         {CHAR, "CHAR"},
         {STRING, "STRING"},
         {NUMBER, "NUMBER"},
-        {UNDEFINED, "UNDEFINED"}
+        {UNDEFINEDDT, "UNDEFINED"}
     };
 
     struct MapToHex {
@@ -112,6 +112,8 @@ namespace token {
         {"!=", "AACCCC"},
         {"<", "AA1111"},
         {">", "AA5555"},
+        {"<=", "FA1111"},
+        {">=", "FA5555"}
     };
 
     std::map<std::string, std::string> dataType = {
@@ -214,9 +216,9 @@ namespace token {
 };
 
 struct Token {
-    token::Type type = token::Type::UNDEFINED;
-    token::SubType subType = token::SubType::UNDEFINED;
-    token::DataType dataType = token::DataType::UNDEFINED;
+    token::Type type = token::Type::UNDEFINEDT;
+    token::SubType subType = token::SubType::UNDEFINEDST;
+    token::DataType dataType = token::DataType::UNDEFINEDDT;
 
     std::string value;
     std::string color;

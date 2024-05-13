@@ -9,12 +9,11 @@
 struct Syntactical {
     struct Id {
         int dep = -1;
-        token::DataType dt = token::DataType::UNDEFINED;
-        token::SubType st = token::SubType::UNDEFINED;
+        token::DataType dt = token::DataType::UNDEFINEDDT;
+        token::SubType st = token::SubType::UNDEFINEDST;
         
         Id() {}
-        Id(token::DataType dt) : dt(dt) {}
-        Id(int dep, token::DataType type) : dep(dep), dt(dt) {}
+        Id(int dep, token::DataType type, token::SubType st) : dep(dep), dt(dt), st(st) {}
     };
 
     std::vector<Delim> delim;
@@ -96,7 +95,7 @@ struct Syntactical {
             token::Type type = tokens[i].type;
             token::DataType dt = tokens[i].dataType;
             token::SubType st = tokens[i].subType;
-            std::string value = tokens[i].value;
+            std::string& value = tokens[i].value;
 
             if (checkSpace()) {
                 std::cout << ' ';
@@ -124,7 +123,7 @@ struct Syntactical {
             }
             else if (state == 1) {
                 dt = paramFunc[id][iParam].dt;
-                doOp("|", dt);
+                expression("|", dt);
                 iParam++;
             }
 
@@ -155,7 +154,7 @@ struct Syntactical {
                 state = 1;
             }
             else if (state == 1) {
-                doOp("_", token::NUMBER);
+                expression("_", token::NUMBER);
                 state = 2;
             }
             else if (state == 2) {
@@ -172,7 +171,7 @@ struct Syntactical {
         }
     }
 
-    void doOp(std::string lim, token::DataType objDT) {
+    void expression(std::string lim, token::DataType objDT) {
         while (i != (int) tokens.size() && tokens[i].value != lim) {
             token::Type type = tokens[i].type;
             token::DataType dt = tokens[i].dataType;
@@ -230,19 +229,25 @@ struct Syntactical {
                 }
                 else if (state == 1) { // operation
                     if (value != "+") {
-                        throwInvChar("Expected concatenation (+) or end of string");
+                        throwInvChar("Expected concatenation or end of string");
                     }
                     
                     hasValue = false;
                     state = 0;
                 }
             }
-            else if (isValidDT(objDT)) { // state 0: ! or value, state 1: value
+            else if (isValidDT(objDT)) { // state 0: - or ! or value, state 1: value
                 std::cout << value;
-                if (state == 0 && value == "!") {
+            
+                if (state == 0 && value == "-") {
                     state = 1;
                 }
                 else if (state <= 1) {
+                    if (value == "!") {
+                        i++;
+                        continue;
+                    }
+
                     if (!isValidDT(dt)) {
                         throwInvChar("Expected " + token::dataTypeToStr[objDT] + " value");
                     }
@@ -250,7 +255,7 @@ struct Syntactical {
                     if (st == token::FUNC || st == token::FUNCTION) {
                         isValidFunc();
                     }
-                    else if (st == token::ARRAY) {
+                    else if (st == token::SubType::ARRAY) {
                         isValidAccessArr();
                     }
                     else {
@@ -284,62 +289,114 @@ struct Syntactical {
         
     }
 
+    token::DataType validateArr() {
+        int state = 0;
+        token::DataType objDT = token::DataType::UNDEFINEDDT;
+        while (i < (int) tokens.size() && state != 3) {
+            token::Type &type = tokens[i].type;
+            token::DataType &dt = tokens[i].dataType;
+            std::string &value = tokens[i].value;
+            token::SubType &st = tokens[i].subType;
+
+            if (checkSpace()) {
+                std::cout << ' ';
+            }
+            if (state == 1) {
+                if (value != "_") {
+                    throwInvChar("Expected opening of data type of array _");
+                }
+            }
+            else if (state == 2) {
+                if (!isValidDT(dt)) {
+                    throwInvChar("Expected data type of array");
+                }
+
+                objDT = dt;
+                if (dt == token::NUMBER) {
+                    std::cout << "std::vector<long double>";  
+                }
+                else {
+                    std::cout << "std::vector<" + value + ">";
+                }
+
+                
+                state = 3;
+                break;
+            }
+
+            state++;
+            i++;
+        }
+
+        if (state == 1) {
+            throwInvChar("Expected opening of data type of array _");
+        }
+        else if (state == 2) {
+            throwInvChar("Expected data type of array");
+        }
+
+        return objDT;
+    }
+
     void declare(std::string limiter) {
         if (tokens[i].value == limiter) {
             return;
         }
 
+        std::string name = "";
+        token::DataType objDT = tokens[i].dataType;
+        token::SubType objST = token::SubType::UNDEFINEDST;
+
         int state = 0;
         int subS = 0;
-        while (state != 4 && tokens[i].value != limiter) {
+        while (state != 4 || tokens[i].value != limiter) {
             token::Type &type = tokens[i].type;
             token::DataType &dt = tokens[i].dataType;
             std::string &value = tokens[i].value;
             token::SubType &st = tokens[i].subType;
-            token::SubType subType = token::SubType::UNDEFINED;
             
             if (checkSpace()) {
                 std::cout << ' ';
             }
             else if (state == 0) {
-                if (type != token::DATATYPE && st == token::SubType::UNDEFINED) {
+                if (type != token::DATATYPE && type != token::SUBTYPE) {
                     throwInvChar("Expected datatype");
                 }
-        
-                if (subS > 0 || st == token::SubType::ARRAY) {
+
+                if (st == token::SubType::FUNCTION || subS > 0) {
                     if (subS == 1) {
                         if (value != "_") {
-                            throwInvChar("Expected opening of data type of array");
+                            throwInvChar("Expected start of data type _");
                         }
-
-                        std::cout << '<';
                     }
                     else if (subS == 2) {
                         if (!isValidDT(dt)) {
-                            throwInvChar("Expected data type of array");
+                            throwInvChar("Expected data type");
                         }
 
-                        std::cout << "std::vector<" + value + ">";
+                        objST = token::SubType::FUNC;
+                        objDT = dt;
+                        std::cout << "auto";
 
-                        subType = token::SubType::ARRAY;
                         subS = -1;
                         state = 1;
                     }
 
+                    i++;
                     subS++;
                     continue;
                 }
+                if (st == token::SubType::ARRAY) {
+                    objDT = validateArr();
+                    objST = st;
+                }
                 else if (dt == token::NUMBER) {
                     std::cout << "long double";
-                }
-                else if (dt == token::SubType::FUNCTION) {
-                    std::cout << "auto";
                 }
                 else {
                     std::cout << tokens[i].value;
                 }
 
-                subType = st;
                 state = 1;
             }
             else if (state == 1) {
@@ -352,7 +409,8 @@ struct Syntactical {
                     throwInvChar("Identifier already declared, invalid redeclaration");
                 }
 
-                ids[value].push_back(Id(j, dt));
+                name = value; 
+                ids[value].push_back(Id(j, objDT, objST));
                 std::cout << value;
 
                 state = 2;
@@ -370,25 +428,109 @@ struct Syntactical {
 
                 state = 3;
             }
-            else if (state = 3) {
-                if (dT = token::ARRAY) {
-                    if (state == 0 && type == token::IDENTIFIER) {
-                    Id id = getLastId(value);
-                    if (id.dt != objDT) {
-                        throwInvChar("Expected array of same data type");
+            else if (state == 3) {
+                if (objST == token::ARRAY) {
+                    if (subS == 0) {
+                        if (value != "|") {
+                            throwInvChar("Expected opening of array |");
+                        }
+
+                        std::cout << '{';
+                        subS = 1;
                     }
+                    else if (subS == 1) {
+                        if (value == "|") {
+                            std::cout << '}';
+                            subS = 3;
+                            state = 4;
+                        }
+                        else {
+                            expression("|", objDT);
+                            std::cout << ',';
+                            subS = 2;
+                        }
+                    }
+                    else if (subS == 2) {
+                        if (value == limiter) {
+                            std::cout << '}';
 
-                    std::cout << value;
+                            return;
+                        }
+                        else {
+                            expression("|", objDT);
+                            std::cout << ',';
+                        }
+                    }
+                    else {
+                        if (value != limiter) {
+                            throwInvChar("Expected closing of declaration" + limiter);
+                        }
 
+                            std::cout << '}';
+
+                        return;
+                    }
                 }
-                else if (dT == token::SubType::FUNC || dT == token::SubType::FUNCTION) {
+                else if (objST == token::SubType::FUNC || objST == token::SubType::FUNCTION) {
+                    if (subS == 0) {
+                        if (value != "|") {
+                            throwInvChar("Expected opening of function |");
+                        }
 
-                }
-                else if (isValidDt(subType)) {
-                    std::cout << value;
+                        std::cout << '(';
+                        subS = 1;
+                    }
+                    else if (subS == 1) {
+                        if (value != "|") {
+                            if (type != token::DATATYPE && type != token::SUBTYPE) {
+                                throwInvChar("Expected datatype");
+                            }
+                            
+                            declare("|");
+                            // token::DataType curDT = tokens[i].dataType;
+                            // token::SubType curST = tokens[i].subType;
+                            // if (type != token::DATATYPE && type != token::SUBTYPE) {
+                            //     throwInvChar("Expected datatype");
+                            // }
+                            // if (st == token::SubType::ARRAY) {
+                            //     curDT = validateArr();
+                            // }
+                            // else if (isValidDT(dt)) {
+                                
+                            // }
+                            // else {
+                            //     throwInvChar("Expected data type");
+                            // }
+                            
+                            // paramFunc[name].push_back(Id(j, curDT, curST));
+                            // subS = 2;
+                        }
+                        else {
+                            std::cout << ')';
+                            subS = 3;
+                        }
+                    }
+                    else if (subS == 2) {
+                        if (value == "|") {
+                            std::cout << ')';
+                            subS = 3;
+                        }
+                        else {
+                            std::cout << ", ";
+                            declare("|");
+                        }
+                    }
+                    else if (subS == 3) {
+                        if (value != limiter) {
+                            throwInvChar("Expected closing of declaration" + limiter);
+                        }
+
+                        return;
+                    }
                 }
                 else {
-                    throwInvChar("Expected value");
+                    expression(";", objDT);
+                    return;
                 }
             }
 
@@ -404,12 +546,13 @@ struct Syntactical {
                     throwInvChar("Expected assignment");
                 }
                 else if (state == 3) {
-                    throwInvChar("Expected value");
+                    throwInvChar("Expected correct value");
                 }
             }
         }
-    }
 
+    }
+    
     void root() {
         if (i == (int) tokens.size()) {
             return;
@@ -419,7 +562,13 @@ struct Syntactical {
         std::string &value = tokens[i].value;
         if (checkSpace() || value == ";") {
             std::cout << value;
-            i++;
+        }
+        else if (value == "~") {
+            if (j == 0) {
+                throwInvChar("Invalid closing delimiter");
+            }
+
+            j--;
         }
         else if (type == token::LOOP) {
             j++;
@@ -438,10 +587,19 @@ struct Syntactical {
 
         }
         else if (type == token::IDENTIFIER) {
-
+            Id id = getLastId(value);
+            if (id.dep == -1) {
+                throwInvChar("Identifier not declared");
+            }
+            
+            std::cout << value;
+            i++;
+            expression(";", tokens[i].dataType);
+            std::cout << ';';
         }
         else if (type == token::DATATYPE || type == token::SUBTYPE) {
-
+            declare(";");
+            std::cout << ';';
         }
         else if (type == token::INPUT) {
 
@@ -452,12 +610,20 @@ struct Syntactical {
         else {
             throwInvChar("Invalid character");
         }
+        
+        i++;
+        root();
     }
 
     void parse(std::string& path) {
         std::ofstream file(path);
         
         root();
+
+        if (j != 0) {
+            i--;
+            throw std::invalid_argument("Invalid closing delimiter");
+        }
 
         file.close();
     }

@@ -19,7 +19,7 @@ struct CompilerToBmp {
         std::vector<Token>& tokens = lexical.tokenize(inp);
             syntactical.tokens = tokens;
 
-            inp.substr(0, inp.find('/'));
+            inp = inp.substr(0, inp.find('/'));
             std::string out = "output/" + inp.substr(0, inp.find_last_of('.')) + ".cpp";
             syntactical.parse(out);
     }

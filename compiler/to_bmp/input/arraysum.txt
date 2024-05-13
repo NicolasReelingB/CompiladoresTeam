@@ -10,7 +10,7 @@ func maxsub = | number a | number size | ~
 
 
   for |number i = 0 | i<size | i = i + 1 | ~
-     maxendh = maxendh + a_i; 
+     maxendh = maxendh + a_i_; 
      if | maxsf<maxendh*3 | ~ maxsf=maxendh; ~
      if | maxendh<0 | ~ maxendh = 0; ~
   ~ 

@@ -131,6 +131,29 @@ struct Lexical {
                         auto &[color, type] = keyword[str];
                         int pos = col - lenStr + 1;
                         tokens.push_back(Token(type, str, color, numLine, pos));
+
+                        if (type == token::DATATYPE) {
+                            token::DataType& dt = tokens.back().dataType;
+                            if (str == "number") {
+                                dt = token::NUMBER;
+                            }
+                            else if (str == "string") {
+                                dt = token::STRING;
+                            }
+                            else if (str == "char") {
+                                dt = token::CHAR;
+                            }
+                            else if (str == "bool") {
+                                dt = token::BOOL;
+                            }
+                        }
+                        
+                        if (str == "array") {
+                            tokens.back().subType = token::ARRAY;
+                        }
+                        else if (str == "func" || str == "function") {
+                            tokens.back().subType = token::FUNC;
+                        }
                     }
                     else {
                         token::Type type = token::IDENTIFIER;
