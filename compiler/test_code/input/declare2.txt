@@ -1,0 +1,4 @@
+string l = "4";
+string m;
+string o = m + l;
+string p = (m + l + o) + (m) + (l + (m + ((((l))))));

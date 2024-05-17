@@ -4,6 +4,7 @@
 
 namespace token {
     enum Type {
+        UNDEFINEDT = 0,
         ARITHMETIC,
         ARRAYOP,
         ASSIGNMENT,
@@ -19,48 +20,61 @@ namespace token {
         INPUT,
         OUTPUT,
         VOID,
-        WHITESPACE
+        WHITESPACE,
+        RETURN,
+        OP,
+        SUBTYPE
     };
 
     std::map<Type, std::string> typeToStr = {
-        {ARITHMETIC, "ARITHMETIC"},
-        {ARRAYOP, "ARRAYOP"},
-        {ASSIGNMENT, "ASSIGNMENT"},
-        {CONDITIONAL, "CONDITIONAL"},
-        {COMPARISON, "COMPARISON"},
-        {DATA, "DATA"},
-        {DATATYPE, "DATATYPE"},
-        {DELIMITATION, "DELIMITATION"},
-        {FUNCTION, "FUNCTION"},
-        {LOGICAL, "LOGICAL"},
-        {LOOP, "LOOP"},
-        {IDENTIFIER, "IDENTIFIER"},
-        {INPUT, "INPUT"},
-        {OUTPUT, "OUTPUT"},
-        {VOID, "VOID"},
-        {WHITESPACE, "WHITESPACE"}
+        {Type::UNDEFINEDT, "UNDEFINED"},
+        {Type::ARITHMETIC, "ARITHMETIC"},
+        {Type::ARRAYOP, "ARRAYOP"},
+        {Type::ASSIGNMENT, "ASSIGNMENT"},
+        {Type::CONDITIONAL, "CONDITIONAL"},
+        {Type::COMPARISON, "COMPARISON"},
+        {Type::DATA, "DATA"},
+        {Type::DATATYPE, "DATATYPE"},
+        {Type::DELIMITATION, "DELIMITATION"},
+        {Type::FUNCTION, "FUNCTION"},
+        {Type::LOGICAL, "LOGICAL"},
+        {Type::LOOP, "LOOP"},
+        {Type::IDENTIFIER, "IDENTIFIER"},
+        {Type::INPUT, "INPUT"},
+        {Type::OUTPUT, "OUTPUT"},
+        {Type::VOID, "VOID"},
+        {Type::WHITESPACE, "WHITESPACE"},
+        {Type::RETURN, "RETURN"},
+        {Type::OP, "OP"},
+        {Type::SUBTYPE, "SUBTYPE"}
+    };
+
+    enum SubType {
+        UNDEFINEDST = 100,
+        ARRAY,
+        FUNCTION
+    };
+
+    std::map<SubType, std::string> subTypeToStr = {
+        {SubType::UNDEFINEDST, "UNDEFINED"},
+        {SubType::ARRAY, "ARRAY"},
+        {SubType::FUNCTION, "FUNCTION"}
     };
 
     enum DataType {
-        ARRAY,
+        UNDEFINEDDT = 200,
         BOOL,
         CHAR,
-        FUNC,
-        FUNCTION,
         STRING,
-        NUMBER,
-        UNDEFINED
+        NUMBER
     };
 
     std::map<DataType, std::string> dataTypeToStr = {
-        {ARRAY, "ARRAY"},
-        {BOOL, "BOOL"},
-        {CHAR, "CHAR"},
-        {FUNC, "FUNC"},
-        {FUNCTION, "FUNCTION"},
-        {STRING, "STRING"},
-        {NUMBER, "NUMBER"},
-        {UNDEFINED, "UNDEFINED"}
+        {DataType::UNDEFINEDDT, "UNDEFINED"},
+        {DataType::BOOL, "BOOL"},
+        {DataType::CHAR, "CHAR"},
+        {DataType::STRING, "STRING"},
+        {DataType::NUMBER, "NUMBER"}
     };
 
     struct MapToCode {
@@ -103,7 +117,9 @@ namespace token {
         {"AAFFFF", "=="},
         {"AACCCC", "!="},
         {"AA1111", "<"},
-        {"AA5555", ">"}
+        {"AA5555", ">"},
+        {"FA1111", "<="},
+        {"FA5555", ">="}
     };
 
     std::map<std::string, std::string> dataType = {
@@ -170,6 +186,12 @@ namespace token {
         {"2024AB", "print"}
     };
 
+    std::map<std::string, std::string> subTypes = {
+        {"00FFFF", "array"},
+        {"FF00FF", "func"},
+        {"FF00FF", "function"}
+    };
+
     std::map<std::string, std::string> whitespace = {
         {"FFFFFF", " "}
     };
@@ -183,38 +205,40 @@ namespace token {
         MapToCode(comparison, COMPARISON),
         MapToCode(dataType, DATATYPE),
         MapToCode(delimitation, DELIMITATION),
-        MapToCode(function, FUNCTION),
         MapToCode(input, INPUT),
         MapToCode(isVoid, VOID),
         MapToCode(loop, LOOP),
         MapToCode(logical, LOGICAL),
         MapToCode(number, DATA),
         MapToCode(output, OUTPUT),
-        MapToCode(whitespace, WHITESPACE)
+        MapToCode(whitespace, WHITESPACE),
+        MapToCode(subTypes, SUBTYPE)
     };
 };
 
 struct Token {
-    token::Type type;
-    token::DataType dataType;
-    std::string value;
-    std::string color;
+    token::Type type = token::Type::UNDEFINEDT;
+    token::SubType subType = token::SubType::UNDEFINEDST;
+    token::DataType dataType = token::DataType::UNDEFINEDDT;
+
+    std::string value = "";
+
     int line;
     int column;
 
-    Token(token::Type type, std::string value, std::string color, int line, int column) : 
+    Token() {}
+
+    Token(token::Type type, std::string value, int line, int column) : 
         type(type), 
         value(value), 
-        color(color),
         line(line), 
         column(column) 
         {}
 
-    Token(token::DataType dataType, std::string value, std::string color, int line, int column) : 
+    Token(token::DataType dataType, std::string value, int line, int column) : 
         type(token::DATA),
         dataType(dataType), 
         value(value), 
-        color(color),
         line(line), 
         column(column) 
         {}

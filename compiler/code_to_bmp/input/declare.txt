@@ -1,0 +1,12 @@
+number a = 0;
+number b= a + -!-3 + 'c';
+
+array_  number c = | |;
+array  _number d = c;
+array _ number e = | 3 |;
+array_number f = | 1 | -1| 4| (-!-!(-a + b)) |;
+
+bool g   ;
+number h ;
+array_string i;
+

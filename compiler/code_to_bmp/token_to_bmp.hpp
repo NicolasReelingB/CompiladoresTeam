@@ -49,13 +49,11 @@ namespace token {
     enum SubType {
         UNDEFINEDST = 100,
         ARRAY,
-        FUNC,
         FUNCTION
     };
 
     std::map<SubType, std::string> subTypeToStr = {
         {ARRAY, "ARRAY"},
-        {FUNC, "FUNC"},
         {FUNCTION, "FUNCTION"}
     };
 
@@ -220,11 +218,13 @@ struct Token {
     token::SubType subType = token::SubType::UNDEFINEDST;
     token::DataType dataType = token::DataType::UNDEFINEDDT;
 
-    std::string value;
+    std::string value = "";
     std::string color;
 
     int line;
     int column;
+
+    Token() {}
 
     Token(token::Type type, std::string value, std::string color, int line, int column) : 
         type(type), 
