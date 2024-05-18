@@ -19,3 +19,6 @@ string p = (m + l + o) + (m) + (l + (m + ((((l))))));
 char q = 'a';
 char r = 'b';
 char s = q - r;
+
+number t = 1 +-+! 4;
+number u = t * - + - -+!q;

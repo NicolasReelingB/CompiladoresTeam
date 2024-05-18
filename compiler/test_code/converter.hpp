@@ -61,13 +61,13 @@ struct Converter {
     void throwInvChar(std::string msg) {
         std::string msgLine = " at line: " + std::to_string(tokens[i].line);
         std::string msgCol = " column: " + std::to_string(tokens[i].column) + ".";
-        std::string msgRec = " received: " + tokens[i].value;
+        std::string msgRec = " Received: " + *val;
         throw std::invalid_argument(msg + msgLine + msgCol + msgRec);
     }
 
     void adv() {
         i++;
-        if (i == len) {
+        if (i >= len) {
             return;
         }
 
@@ -165,16 +165,14 @@ struct Converter {
         }
     }
 
-    void matchTypeDT(token::Type expType, bool advance = true) {
+    void matchTypeDT(token::Type expType, bool advance = true, bool print = true) {
         getToken();
         if (*type != expType) {
             throwInvChar("Expected " + token::typeToStr[expType]);
         }
-        if (*dt == token::DataType::NUMBER) {
-            std::cout << "long double";
-        }
-        else {
-            std::cout << *val;
+
+        if (print) {
+            printDT();
         }
 
         if (advance) {
@@ -193,6 +191,18 @@ struct Converter {
 
         std::cout << *val;
         adv();
+    }
+
+    void printDT() {
+        if (*dt == token::DataType::NUMBER) {
+            std::cout << "long double";
+        }
+        else if (*dt == token::DataType::STRING) {
+            std::cout << "std::string";
+        }
+        else {
+            std::cout << *val;
+        }
     }
 
     Id getLastId(std::string& identifier) {
@@ -265,22 +275,31 @@ struct Converter {
         std::string lim, 
         std::string print, 
         token::DataType objDT, 
-        token::Type last = token::Type::UNDEFINEDT
+        int last = 0
     ) {
         if (matchVal("(", "(", 36)) {
-            expression(")", ")", objDT, last);
-            last = token::Type::UNDEFINEDT;
-        }
-        else if (matchVal("-", "-", 36)) {
-            if (matchVal("-", "", 4)) {
+            if (last == 1) {
                 throwInvChar("Invalid operator");
             }
-
+            
+            expression(")", ")", objDT, last);
+            last = 0;
+        }
+        else if (matchVal("-", "-", 36)) {
             if (objDT == token::DataType::STRING) {
                 throwInvChar("Invalid operator for string");
             }
 
-            expression(lim, print, objDT);
+            assert(i - 2 >= 0);
+            if (tokens[i - 2].value == tokens[i - 1].value) {
+                throwInvChar("Invalid operator");
+            }
+            
+            expression(lim, print, objDT, 2);
+            return;
+        }
+        else if (matchVal("+", "+", 36)) {
+            expression(lim, print, objDT, 2);
             return;
         }
         else if (matchVal("!", "!", 36)) {
@@ -288,29 +307,26 @@ struct Converter {
                 throwInvChar("Invalid operator ! for string");
             }
 
-            expression(lim, print, objDT);
+            expression(lim, print, objDT, last);
             return;
         }
         else if (validOp.count(*val)) {
-            if (last == token::Type::ARITHMETIC) {
+            if (last == 0 || last == 2) {
                 throwInvChar("Invalid operator");
-            }
-            if (objDT == token::DataType::STRING && *val != "+") {
-                throwInvChar("Invalid operator for string");
             }
 
             std::cout << *val;
             adv();
-            expression(lim, print, objDT, token::Type::ARITHMETIC);
+            expression(lim, print, objDT, 2);
             return;
         }
         else {
-            if (last == token::Type::DATA) {
+            if (last == 1) {
                 throwInvChar("Expected valid expression");
             }
 
             matchDT(objDT);
-            last = token::Type::DATA;
+            last = 1;
         }
 
         if (!matchVal(lim, print, 36)) {
@@ -318,41 +334,45 @@ struct Converter {
         }
     }
 
+    void defineArr(token::DataType& objDT, std::string& nameType) {
+        std::cout << "std::vector";
+        matchVal("_", "<", 44);
+        getToken();
+
+        objDT = *dt;
+        matchTypeDT(token::Type::DATATYPE, false);
+        nameType = "std::vector<" + *val + ">";
+        adv();
+        if (matchVal("_", "", 1)) {
+            matchVal("_", ">", 46);
+        }
+        else {
+            std::cout << ">";
+            i = lastI;
+        }
+    }
+
     void declare(std::string limiter, std::string print) {
         std::string name = "";
+        std::string nameType = "";
         token::DataType& objDT = *dt;
         token::SubType& objST = *st;
-        std::string& value = *val;
 
         adv();
         if (objST == token::SubType::FUNCTION) {
             std::cout << "auto";
             matchVal("_", "", 44);
 
-            matchTypeDT(token::Type::DATATYPE);
+            matchTypeDT(token::Type::DATATYPE, false, false);
 
             objDT = *dt;
+            adv();
         }
         else if (objST == token::SubType::ARRAY) {
-            std::cout << "std::vector";
-            matchVal("_", "<", 44);
-            getToken();
-
-            objDT = *dt;
-            matchTypeDT(token::Type::DATATYPE);
-            if (matchVal("_", "", 1)) {
-                matchVal("_", ">", 46);
-            }
-            else {
-                std::cout << ">";
-                i = lastI;
-            }
-        }
-        else if (objDT == token::DataType::NUMBER) {
-            std::cout << "long double";
+            defineArr(objDT, nameType);
         }
         else {
-            std::cout << value;
+            printDT();
         }
 
         matchType(token::Type::IDENTIFIER);
@@ -372,31 +392,54 @@ struct Converter {
         matchVal("=", "=", 44);
 
         if (objST == token::SubType::FUNCTION) {
-            std::cout << "[&]";
+            std::cout << " [&]";
             matchVal("|", "(", 44);
             std::cout << "auto &&" + name;
             if (!matchVal("|", ")", 36)) {
+                std::cout << ",";
                 while (true) {
-                    if (*type != token::Type::DATATYPE) {
-                        throwInvChar("Expected data type");
-                    }
+                    getToken();
+
+                    token::DataType objDT2 = *dt;
+                    token::SubType objST2 = *st;
                     if (*st == token::SubType::FUNCTION) {
-                        throwInvChar("Invalid function declaration");
+                        throwInvChar("Invalid function declaration as parameter");
+                    }
+                    if (*st == token::SubType::ARRAY) {
+                        adv();
+                        defineArr(objDT2, nameType);
+                    }
+                    else {
+                        matchTypeDT(token::Type::DATATYPE);
                     }
 
-                    paramFunc[name].push_back(Id(j, *dt, *st));
+                    Id id = getLastId(*val);
+                    if (id.dep == j) {
+                        throwInvChar("Identifier already declared, invalid redeclaration");
+                    }
+
+                    paramFunc[*val].push_back(Id(j, objDT2, objST2));
 
                     matchType(token::Type::IDENTIFIER);
 
-                    // matchVal("|", "", true);
-                    // if (matchVal("~")) {
-                    //     std::cout <<
-                    //     break;
-                    // }
+                    if (matchVal("=", "=", 36)) {
+                        expression("|", "", objDT2);
+                        i--;
+                    }
+                    
+                    matchVal("|", "", 9);
 
-
+                    i++;
+                    if (matchVal("~")) {
+                        matchVal("|", ")", 46);
+                        break;
+                    }
+                    
+                    matchVal("|", ",", 46);
                 }   
             }
+
+            std::cout << " -> " + nameType;
 
             matchVal("~", "{", 44);
             ++j;
@@ -414,7 +457,10 @@ struct Converter {
     
     void root() {
         matchVal(";", ";", 36);
-        if (*val == "~") {
+        if (*type == token::Type::RETURN) {
+
+        }
+        else if (*val == "~") {
             if (j == 0) {
                 throwInvChar("Invalid closing delimiter");
             }

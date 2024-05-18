@@ -215,6 +215,7 @@ struct Lexical {
         for (auto &line : lines) {
             std::cout << line << '\n';
         }
+        std::cout << '\n';
         
         return tokens;
     }

@@ -1,10 +1,9 @@
-
 array_number a = | -2 | -3 | -4 |;
  number size = 3; 
 
 
 
-func maxsub = | number a | number size | ~
+func_number maxsub = | number a | number size | ~
   number maxsf =-16;
   number maxendh = 0;
 

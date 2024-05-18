@@ -1,4 +1,4 @@
-array a_number =  -2 | -3 | -4 ;
+array a_number =  |-2 | -3 | -4| ;
  int size = 3; 
 
 func maxsub = | a | size | °

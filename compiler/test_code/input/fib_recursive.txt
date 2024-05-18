@@ -1,6 +1,6 @@
 number n = 9;
 
-func fib = |number n|~
+func_number fib = |number n|~
   if | n<=1 | ~ 
     return n; 
   ~

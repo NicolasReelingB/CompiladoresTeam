@@ -1,4 +1,4 @@
-string a = "Hello World"
+string a = "Hello World";
 
-print a
+print a;
 
