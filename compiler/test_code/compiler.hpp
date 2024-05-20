@@ -18,6 +18,6 @@ struct Compiler {
 
         inp = inp.substr(0, inp.find('/'));
         std::string out = "output/" + inp.substr(0, inp.find_last_of('.')) + ".cpp";
-        converter.parse(out);
+        converter.convert(out);
     }
 };

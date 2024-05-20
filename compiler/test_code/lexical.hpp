@@ -75,11 +75,18 @@ struct Lexical {
                     if (col != lenLine - 1 && keyword.count(str + std::string(1, nxt))) {
                         continue;
                     }   
+                    if (col != lenLine - 1 && std::isalpha(str[0]) && std::isalnum(nxt)) {
+                        continue;
+                    }
                     
                     if (keyword.count(str)) {
                         auto &[color, type] = keyword[str];
                         int pos = col - lenStr + 1;
                         tokens.push_back(Token(type, str, numLine, pos));
+
+                        if (type == token::Type::DATA) {
+                            tokens.back().dataType = token::DataType::BOOL;
+                        }
 
                         if (type == token::DATATYPE) {
                             token::DataType& dt = tokens.back().dataType;
@@ -159,6 +166,10 @@ struct Lexical {
         }
 
         std::ifstream file(path);
+        if (!file.is_open()) {
+            throw std::invalid_argument("File not found");
+        }
+
         std::string line;
         int numLine = 0;
 

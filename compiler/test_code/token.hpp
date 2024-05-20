@@ -135,15 +135,16 @@ namespace token {
         {";", "FF5353"}
     };
 
-    std::map<std::string, std::string> isReturn = {
-        {"return", "BC7FFF"}
-    };
-
     std::map<std::string, std::string> input = {
         {"read", "6A09B0"},
     };
 
+    std::map<std::string, std::string> isReturn = {
+        {"return", "BC7FFF"}
+    };
+
     std::map<std::string, std::string> isVoid = {
+        {"void", "000000"},
         {"$", "000000"}
     };
     

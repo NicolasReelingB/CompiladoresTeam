@@ -1,4 +1,4 @@
-func_void bubblesort = |array a| number n| ~
+func_void bubblesort = |array_number arr| number n| ~
  number i;
  number j;
  number temp;
@@ -13,20 +13,21 @@ func_void bubblesort = |array a| number n| ~
 	  swap = true;
 	~
     ~
-    if (!swap)
+    if |!swap| ~
      i = n-1;
+    ~
   ~
 ~
 
-func printArray = |array a| number size| ~
+func_void printArray = |array_number a| number size| ~
   for | number i =0 | i<size | i = i + 1|~
-    print a_i;
+    print a_i_;
   ~
 ~
-array a = |64|34|25|12|22|11|90|;
-number size= 7;
+array_number myarr = |64|34|25|12|22|11|90|;
+number size2 = 7;
 
-bubblesort|a|size|;
+bubblesort|myarr|size2|;
 print "Sorted array: ";
-printArray|a|size|;
+printArray|myarr|size2|;
 
