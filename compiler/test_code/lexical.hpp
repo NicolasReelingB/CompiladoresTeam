@@ -128,7 +128,7 @@ struct Lexical {
                 }
             }
             else if (s == 2 || s == 3) { // integer or double = number
-                if (c == '.') {
+                if (col != lenLine - 1 && nxt == '.') {
                     if (s == 3) {
                         throwInvChar(numLine, col, "invalid character", str);
                     }
@@ -136,6 +136,7 @@ struct Lexical {
                     s = 3;
                 }
                 else if (col == lenLine - 1 || !std::isdigit(nxt)) {
+
                     pushTokenData(str, s, numLine, col, token::DataType::NUMBER);
                 }
             }
