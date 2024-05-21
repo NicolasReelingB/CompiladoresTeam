@@ -16,7 +16,7 @@ struct Compiler {
         std::vector<Token>& tokens = lexical.tokenize(inp);
         converter.tokens = tokens;
 
-        inp = inp.substr(0, inp.find('/'));
+        inp = inp.substr(std::min(inp.find('/') + 1, inp.size()));
         std::string out = "output/" + inp.substr(0, inp.find_last_of('.')) + ".cpp";
         converter.convert(out);
     }

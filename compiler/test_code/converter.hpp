@@ -18,6 +18,13 @@ struct Converter {
         Id(int dep, token::DataType dt, token::SubType st) : dep(dep), dt(dt), st(st) {}
     };
 
+    struct NameId {
+        std::string name;
+        int dep = -1;
+
+        NameId(std::string& name, int dep) : name(name), dep(dep) {}
+    };
+
     token::Type* type;
     token::DataType* dt;
     token::SubType* st;
@@ -35,7 +42,11 @@ struct Converter {
 
     std::map<std::string, std::vector<Id>> paramFunc;
 
+    std::vector<NameId> lastIds;
     std::vector<Id> expReturn;
+
+    std::ofstream fileOut;
+    bool newLine = true;
 
     std::set<token::DataType> validDt = {
         token::DataType::BOOL, 
@@ -55,10 +66,31 @@ struct Converter {
         ">",
         "<",
         ">=",
-        "<="
+        "<=",
         "&&",
         "||"
     };
+
+    void reset() {
+        i = 0;
+        numLine = 1;
+        j = 0;
+        ids.clear();
+        paramFunc.clear();
+        lastIds.clear();
+        expReturn.clear();
+    }
+
+    void printOut(std::string out) {
+        if (newLine) {
+            newLine = false;
+            fileOut << "    ";
+        }
+        newLine |= out == "\n";
+
+        fileOut << out;
+        std::cout << out;
+    }
 
     void throwInvChar(std::string msg) {
         std::string msgLine = " at line: " + std::to_string(tokens[i].line);
@@ -73,8 +105,8 @@ struct Converter {
             return;
         }
 
-        while (numLine != tokens[i].line) {
-            std::cout << '\n';
+        while (numLine < tokens[i].line) {
+            printOut("\n");
             numLine++;
         }
     }
@@ -83,11 +115,11 @@ struct Converter {
         while (i < len && tokens[i].type == token::WHITESPACE) {
             if (print) {
                 while (numLine != tokens[i].line) {
-                    std::cout << '\n';
+                    printOut("\n");
                     numLine++;
                 }
 
-                std::cout << ' ';
+                printOut(" ");
             }   
             
             adv();
@@ -121,7 +153,7 @@ struct Converter {
         }
 
         if (*val == expVal) {
-            std::cout << print;
+            printOut(print);
             if (param >> 5 & 1) {
                 adv();
             }
@@ -143,12 +175,18 @@ struct Converter {
             }
         } 
 
-        if (*dt == token::STRING ^ expDT == token::STRING || *dt != expDT) {
+        if (*dt == token::STRING ^ expDT == token::STRING || (*dt == token::UNDEFINEDDT && *dt != expDT)) {
             throwInvChar("Expected " + token::dataTypeToStr[expDT] + " value");
         }
 
         std::string& name = *val;
-        std::cout << *val;
+        if (*dt == token::DataType::STRING) {
+            printOut("std::string(" + name + ")");
+        }
+        else {
+            printOut(name);
+        }
+
         adv();
         if (*st == token::SubType::FUNCTION) {
             validateFuncCall(name);
@@ -164,7 +202,7 @@ struct Converter {
             throwInvChar("Expected " + token::typeToStr[expType]);
         }
 
-        std::cout << *val;
+        printOut(*val);
 
         if (advance) {
             adv();
@@ -195,7 +233,7 @@ struct Converter {
             throwInvChar("Expected same data type");
         }
 
-        std::cout << *val;
+        printOut(*val);
         adv();
     }
 
@@ -212,7 +250,7 @@ struct Converter {
         }
 
         if (print) {
-            std::cout << toPrint;
+            printOut(toPrint);
         }
 
         return toPrint;
@@ -237,11 +275,11 @@ struct Converter {
     
     void validateFuncCall(std::string& id) {
         matchVal("|", "(", 44);
-        std::cout << id;
+        printOut(id);
 
         std::vector<Id>& pf = paramFunc[id];
         for (int idx = 0; idx < (int) pf.size(); idx++) {
-            std::cout << ',';
+            printOut(",");
 
             getToken();
             if (pf[idx].st == token::SubType::ARRAY) {
@@ -266,6 +304,17 @@ struct Converter {
         expression("_", "]", token::DataType::NUMBER);
     }
 
+    void eraseId() {
+        while (!lastIds.empty() && lastIds.back().dep >= j) {
+            ids[lastIds.back().name].pop_back();
+            lastIds.pop_back();
+        }
+
+        while (!expReturn.empty() && expReturn.back().dep >= j) {
+            expReturn.pop_back();
+        }
+    }
+
     void exprArr(std::string lim, std::string print, token::DataType& expDT) {
         if (matchVal("|", "{", 36) || matchVal("||", "", 4)) {
             if (matchVal("|", "}", 36) || matchVal("||", "{}", 36)) {
@@ -274,7 +323,7 @@ struct Converter {
             }
 
             while (true) {
-                expression("|", "", expDT, token::Type::UNDEFINEDT);
+                expression("|", "", expDT);
                 i--;
                 lastI = i;
                 adv();
@@ -296,15 +345,16 @@ struct Converter {
     void expression(
         std::string lim, 
         std::string print, 
-        token::DataType objDT, 
-        int last = 0
+        token::DataType objDT = token::DataType::UNDEFINEDDT,
+        token::DataType tempDT = token::DataType::UNDEFINEDDT,
+        int last = 0 
     ) {
         if (matchVal("(", "(", 36)) {
             if (last == 1) {
                 throwInvChar("Invalid operator");
             }
             
-            expression(")", ")", objDT, last);
+            expression(")", ")", objDT, tempDT, last);
             last = 0;
         }
         else if (matchVal("+", "+", 36)) {
@@ -313,11 +363,11 @@ struct Converter {
                 throwInvChar("Invalid operator");
             }
 
-            expression(lim, print, objDT, 2);
+            expression(lim, print, objDT, tempDT, 2);
             return;
         }
         else if (matchVal("-", "-", 36)) {
-            if (objDT == token::DataType::STRING) {
+            if (objDT == token::DataType::STRING || tempDT == token::DataType::STRING) {
                 throwInvChar("Invalid operator - for string");
             }
 
@@ -326,33 +376,36 @@ struct Converter {
                 throwInvChar("Invalid operator");
             }
             
-            expression(lim, print, objDT, 2);
+            expression(lim, print, objDT, token::DataType::NUMBER, 2);
             return;
         }
         else if (matchVal("!", "!", 36)) {
-            if (objDT == token::DataType::STRING) {
+            if (objDT == token::DataType::STRING || tempDT == token::DataType::STRING) {
                 throwInvChar("Invalid operator ! for string");
             }
 
-            expression(lim, print, objDT, 2);
+            expression(lim, print, objDT, token::DataType::NUMBER, 2);
             return;
         }
         else if (matchVal("&&", "&&", 36) || matchVal("||", "||", 36)) {
-            if (last == 0 || last == 2) {
+            if (last == 0 || last == 2 || objDT == token::DataType::STRING) {
                 throwInvChar("Invalid operator");
             }
 
-            expression(lim, print, objDT, token::Type::UNDEFINEDT);
+            expression(lim, print, objDT);
             return;
         }
         else if (validOp.count(*val)) {
+            if (objDT == token::DataType::STRING || tempDT == token::DataType::STRING) {
+                throwInvChar("Invalid operator for string");
+            }
             if (last == 0 || last == 2) {
                 throwInvChar("Invalid operator");
             }
 
-            std::cout << *val;
+            printOut(*val);
             adv();
-            expression(lim, print, objDT, 2);
+            expression(lim, print, objDT, token::DataType::NUMBER, 2);
             return;
         }
         else {
@@ -382,12 +435,12 @@ struct Converter {
         }
 
         if (!matchVal(lim, print, 36)) {
-            expression(lim, print, objDT, last);
+            expression(lim, print, objDT, tempDT, last);
         }
     }
 
     std::string defineArr(token::DataType& objDT) {
-        std::cout << "std::vector";
+        printOut("std::vector");
         matchVal("_", "<", 44);
         getToken();
 
@@ -400,7 +453,7 @@ struct Converter {
             matchVal("_", ">", 46);
         }
         else {
-            std::cout << ">";
+            printOut(">");
             i = lastI;
         }
 
@@ -415,10 +468,13 @@ struct Converter {
 
         adv();
         if (objST == token::SubType::FUNCTION) {
-            std::cout << "auto";
+            printOut("auto");
             matchVal("_", "", 44);
 
-            if (matchVal("void", "", 36)) {
+            getToken();
+            if (*type == token::Type::VOID) {
+                printOut("void");
+
                 nameType = "void";
                 objDT = token::DataType::UNDEFINEDDT;
             }
@@ -427,9 +483,9 @@ struct Converter {
 
                 nameType = printDT(false);
                 objDT = *dt;
-                adv();
             }
 
+            adv();
             getToken();
         }
         if (objST == token::ARRAY || (objST == token::FUNCTION && *st == token::ARRAY)) {
@@ -448,6 +504,7 @@ struct Converter {
 
         name = *val; 
         ids[*val].push_back(Id(j, objDT, objST));
+        lastIds.push_back(NameId(name, j));
 
         if (objST != token::SubType::FUNCTION && matchVal(";", ";", 36)) {
             return;
@@ -456,12 +513,14 @@ struct Converter {
         matchVal("=", "=", 44);
 
         if (objST == token::SubType::FUNCTION) {
-            std::cout << " [&]";
+            j++;
+
+            printOut(" [&]");
             matchVal("|", "(", 44);
-            std::cout << "auto&& " + name;
+            printOut("auto&&" + name);
 
             if (!matchVal("|", "", 17)) {
-                std::cout << ",";
+                printOut(",");
             }
 
             if (!matchVal("|", ")", 36)) {
@@ -492,6 +551,7 @@ struct Converter {
                     matchType(token::Type::IDENTIFIER, false);
                     
                     ids[*val].push_back(Id(j, objDT2, objST2));
+                    lastIds.push_back(NameId(*val, j));
 
                     adv();
                     if (matchVal("=", "=", 36)) {
@@ -511,15 +571,18 @@ struct Converter {
                 }   
             }
 
-            std::cout << " -> " + nameType;
+            printOut(" -> " + nameType);
+
+            expReturn.push_back(Id(j, objDT, objST));
 
             matchVal("~", "{", 44);
-            ++j;
             root();
-            --j;
             matchVal("~", "}", 12);     
 
-            std::cout << ';'; 
+            eraseId();
+            j--;
+
+            printOut(";");
             adv();
         }
         else if (objST == token::SubType::ARRAY) {
@@ -528,10 +591,6 @@ struct Converter {
         else {
             expression(limiter, print, objDT);
         }
-    }
-
-    void checkAccArr(Id &id) {
-        
     }
 
     void changeVal(std::string lim, std::string print) {
@@ -547,8 +606,21 @@ struct Converter {
     void root() {
         getToken();
         if (*type == token::Type::RETURN) {
+            if (expReturn.empty()) {
+                throwInvChar("Return statement outside function");
+            }
+
+            printOut("return");
+            
             adv();
-            expression(";", ";", *dt);
+            getToken();
+
+            if (*type == token::Type::VOID) {
+                matchVal(";", ";", 44);
+            }
+            else {
+                expression(";", ";", expReturn.back().dt);
+            }
         }
         else if (*val == "~") {
             if (j == 0) {
@@ -561,7 +633,7 @@ struct Converter {
             j++;
 
             std::string& value = *val;
-            std::cout << value;
+            printOut(value);
 
             adv();
             matchVal("|", "(", 44);
@@ -610,9 +682,12 @@ struct Converter {
                     matchVal("~", "{", 44);
                     root();
                     matchVal("~", "}", 44);
+
+                    eraseId();
                 }   
             }
 
+            eraseId();
             j--;
         }
         else if (*type == token::IDENTIFIER) {
@@ -622,7 +697,7 @@ struct Converter {
             declare(";", ";");
         }
         else if (*type == token::OUTPUT) {
-            std::cout << "std::cout << ";
+            printOut("std::cout << ");
             adv();
             adv();
             expression(";", ";", token::DataType::UNDEFINEDDT);
@@ -640,22 +715,33 @@ struct Converter {
     void convert(std::string& path) {
         len = (int) tokens.size();
         tokens.push_back(Token());
-
-        std::ofstream file(path);
-        // std::cout.rdbuf(file.rdbuf());
-
         
+        fileOut.open(path);
+        
+        std::ifstream fileIn;
+        if (fileIn.is_open()) {
+            fileIn.close();
+        }
+        
+        fileIn.open("template/begin.txt");
+        fileOut << fileIn.rdbuf();
+        // std::cout.rdbuf(fileOut.rdbuf());
+
         type = &tokens[0].type;
         dt = &tokens[0].dataType;
         st = &tokens[0].subType;
         val = &tokens[0].value;
         root();
 
-        // if (j != 0) {
-        //     i--;
-        //     throw std::invalid_argument("Invalid closing delimiter");
-        // }
+        assert(j == 0);
 
-        file.close();
+        fileIn.close();
+        fileIn.open("template/end.txt");
+        fileOut << fileIn.rdbuf();
+
+        fileIn.close();
+        fileOut.flush();
+        fileOut.close();
+        reset();
     }
 };
