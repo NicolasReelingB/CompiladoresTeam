@@ -19,10 +19,11 @@ struct Lexical {
         keyword.clear();
     }
 
-    void throwInvChar(int line, int column, std::string msg) {
+    void throwInvChar(int line, int column, std::string msg, std::string str) {
         std::string lineMsg = " at line: " + std::to_string(line) + ",";
         std::string colMsg = " column: " + std::to_string(column) + ".";
-        throw std::invalid_argument(msg + lineMsg + colMsg);
+        std::string strMsg = " Received: " + str;
+        throw std::invalid_argument(msg + lineMsg + colMsg + strMsg);
     }
 
     void pushToken(std::string &str, int &s, int line, int col, token::Type type) {
@@ -67,7 +68,7 @@ struct Lexical {
                     s = 1;
                 }
                 else {
-                    throwInvChar(numLine, col, "Invalid character");
+                    throwInvChar(numLine, col, "Invalid character", std::string(1, c));
                 }
 
                 if (s > 0) {
@@ -129,7 +130,7 @@ struct Lexical {
             else if (s == 2 || s == 3) { // integer or double = number
                 if (c == '.') {
                     if (s == 3) {
-                        throwInvChar(numLine, col, "invalid character");
+                        throwInvChar(numLine, col, "invalid character", str);
                     }
 
                     s = 3;
@@ -153,7 +154,7 @@ struct Lexical {
                     char e = str[std::min(2, lenStr - 1)];
                     bool isEsc = e == 'n' || e == 't' || e == 'r' || e == 'v' || e == 'f';
                     if (lenStr > 4 || lenStr == 2 || (lenStr == 4 && !isEsc)) {
-                        throwInvChar(numLine, col, "invalid char");
+                        throwInvChar(numLine, col, "invalid char", str);
                     }
 
                     pushTokenData(str, s, numLine, col, token::DataType::CHAR);
@@ -206,10 +207,6 @@ struct Lexical {
         }
 
         file.close();
-
-        if (state != 0) {
-            throwInvChar(numLine, line.size(), "Expected closing");
-        }
 
         std::cout << '\n';
         int maxSize = std::max_element(tokens.begin(), tokens.end(), [&](Token &a, Token &b) {

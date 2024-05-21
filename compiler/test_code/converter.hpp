@@ -359,7 +359,7 @@ struct Converter {
             }
             
             expression(")", ")", objDT, tempDT, last);
-            last = 0;
+            last = 1;
         }
         else if (matchVal("+", "+", 36)) {
             assert(i - 2 >= 0);
