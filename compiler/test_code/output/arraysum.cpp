@@ -4,7 +4,6 @@
 #include <vector>
 
 int main() {
-    std::cout << std::fixed;
     std::vector<long double> a = { -2 , -3 , -4 };
      long double size = 3; 
     

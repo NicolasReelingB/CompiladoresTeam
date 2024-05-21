@@ -114,7 +114,7 @@ struct Converter {
     void getToken(bool print = true) {
         while (i < len && tokens[i].type == token::WHITESPACE) {
             if (print) {
-                while (numLine != tokens[i].line) {
+                while (numLine < tokens[i].line) {
                     printOut("\n");
                     numLine++;
                 }
@@ -473,8 +473,6 @@ struct Converter {
 
             getToken();
             if (*type == token::Type::VOID) {
-                printOut("void");
-
                 nameType = "void";
                 objDT = token::DataType::UNDEFINEDDT;
             }
@@ -597,6 +595,10 @@ struct Converter {
         Id id = getLastId(*val);
         matchDT(id.dt);
 
+        if (id.st == token::SubType::FUNCTION) {
+            matchVal(";", ";", 44);
+            return;
+        }
 
         if (matchVal("=", "=", 36)) {
             expression(lim, print, id.dt);
@@ -604,8 +606,10 @@ struct Converter {
     }
     
     void root() {
-        getToken();
-        if (*type == token::Type::RETURN) {
+        if (matchVal(";", ";", 36)) {
+            
+        }
+        else if (*type == token::Type::RETURN) {
             if (expReturn.empty()) {
                 throwInvChar("Return statement outside function");
             }
@@ -702,7 +706,7 @@ struct Converter {
             adv();
             expression(";", ";", token::DataType::UNDEFINEDDT);
         }
-        else if (i < len && !matchVal(";", ";", 36)) {
+        else if (i < len) {
             throwInvChar("Invalid character");
         }
         else {
@@ -722,7 +726,7 @@ struct Converter {
         if (fileIn.is_open()) {
             fileIn.close();
         }
-        
+
         fileIn.open("template/begin.txt");
         fileOut << fileIn.rdbuf();
         // std::cout.rdbuf(fileOut.rdbuf());

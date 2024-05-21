@@ -4,4 +4,3 @@
 #include <vector>
 
 int main() {
-    std::cout << std::fixed;
