@@ -14,6 +14,11 @@ struct Lexical {
     std::vector<Token> tokens;
     std::map<std::string, std::pair<std::string, token::Type>> keyword;
 
+    void reset() {
+        tokens.clear();
+        keyword.clear();
+    }
+
     void throwInvChar(int line, int column, std::string msg) {
         std::string lineMsg = " at line: " + std::to_string(line) + ",";
         std::string colMsg = " column: " + std::to_string(column) + ".";
@@ -158,6 +163,8 @@ struct Lexical {
     }
 
     std::vector<Token>& tokenize(std::string& path) {
+        reset();
+
         for (int i = 0; i < token::keywordsToHex.size(); i++) {
             std::map<std::string, std::string> &m = token::keywordsToHex[i].mapToHex;
             for (const auto &[key, color] : m) {
@@ -228,6 +235,7 @@ struct Lexical {
         }
         std::cout << '\n';
         
+
         return tokens;
     }
 };

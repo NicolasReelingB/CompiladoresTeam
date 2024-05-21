@@ -75,10 +75,14 @@ struct Converter {
         i = 0;
         numLine = 1;
         j = 0;
+        newLine = true;
         ids.clear();
         paramFunc.clear();
         lastIds.clear();
         expReturn.clear();
+        tokens.clear();
+
+        std::cout << '\n' << '\n';
     }
 
     void printOut(std::string out) {
@@ -515,7 +519,7 @@ struct Converter {
 
             printOut(" [&]");
             matchVal("|", "(", 44);
-            printOut("auto&&" + name);
+            printOut("auto&& " + name);
 
             if (!matchVal("|", "", 17)) {
                 printOut(",");
@@ -723,9 +727,6 @@ struct Converter {
         fileOut.open(path);
         
         std::ifstream fileIn;
-        if (fileIn.is_open()) {
-            fileIn.close();
-        }
 
         fileIn.open("template/begin.txt");
         fileOut << fileIn.rdbuf();
@@ -740,12 +741,13 @@ struct Converter {
         assert(j == 0);
 
         fileIn.close();
+        
         fileIn.open("template/end.txt");
         fileOut << fileIn.rdbuf();
 
-        fileIn.close();
-        fileOut.flush();
         fileOut.close();
+        fileIn.close();
+
         reset();
     }
 };
