@@ -1,0 +1,60 @@
+array_number one = |0|4|0|0|0|0|0|8|0|;
+array_number two = |4|0|8|0|0|0|0|11|0|;
+array_number thr = |0|8|0|7|0|4|0|0|2|;
+array_number fou = |0|0|7|0|9|14|0|0|0|;
+array_number fiv = |0|0|0|9|0|10|0|0|0|;
+array_number six = |0|0|4|14|10|0|2|0|0|;
+array_number sep = |0|0|0|0|0|2|0|1|6|;
+array_number oct = |8|11|0|0|0|0|1|0|7|;
+array_number non = |0|0|2|0|0|0|6|7|0|;
+
+array_array_number graph = |one|two|thr|fou|fiv|six|sep|oct|non|;
+
+func_number minDistance	= |array_number dist | array_bool sptSet|~
+ number min = 9999999;
+ number minIndex;
+ 
+ for|number v = 0|v<9|v++|~
+  if|sptSet_v_ == false && dist_v_ <= min |~
+   min = dist_v_;
+   minIndex = v;
+  ~
+ ~
+ return minIndex;
+~
+
+func_printSolution |array_number dist|~
+ print "Vertex \t Distance from Source \n"
+ for|number i=0 | i< 9 |i = i+1|~
+  print i
+  print " \t\t\t\t"
+  print dist_i_
+  print "\n"
+ ~
+
+~
+func_void dijkstra = |array_array_number graph | number src|~
+ array_number dist;
+ array_bool sptSet;
+ 
+ for|number i=0|i<9| i = i+1|~
+  dist_i_ = 999999;
+  sptSet_i_ = false;
+ ~
+ dist_src_ = 0;
+
+ for |number count = 0| count < 8 | count = count +1|~
+  number u = minDistance|dist|sptSet|;
+  sptSet_u_ = true;
+  for |number v = 0; v< 9; v = v +1|~
+   if|!sptSet_v_ && graph_u__v_ 
+      && dist_u_ != 999999 
+      && dist_u_ + graph_u__v_ < dist_v_| ~ 
+    dist_v_ =dist_u_ + graph_u__v_;
+   ~
+  ~
+ ~
+ printSolution|dist|;
+~
+
+dijkstra|graph|0|;

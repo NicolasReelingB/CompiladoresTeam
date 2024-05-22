@@ -1,0 +1,3 @@
+func_number ab = |number a| array_bool b| string c| ~
+
+~

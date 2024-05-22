@@ -1,0 +1,31 @@
+array_number _ arr = | 2 | 3 | 4 | 10 | 40 |;
+number query = 10;
+number n = 5;
+
+func_number binarySearch = |array_number_ arr | number low | number high | number x|~
+	if |high >= low| ~
+        number mid = low + (high - low) / 2;
+        
+ 	if |arr_mid_ == x|~
+            return mid;
+	~
+        if |arr_mid_ > x|~
+            return binarySearch|arr | low | mid - 1 | x|;
+	~
+        return binarySearch|arr |mid + 1 | high | x|;
+    ~
+~
+
+
+number result = binarySearch| arr | 0 | n - 1 | query|;
+if |result == -1|~
+        print "Element is not present in array";
+  ~
+else  ~ 
+   print "Element is present at index ";
+   number temp = result;
+   if |result%(2 + 4 - ((2.5 % ((5 +2.5 % 1 == 0))) == 2) - (4 + (2 - 2))) ==0.5| ~
+        result = result + 0.5;
+   ~
+   print result;
+~

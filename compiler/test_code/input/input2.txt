@@ -1,0 +1,19 @@
+array a_number =  |-2 | -3 | -4| ;
+ int size = 3; 
+
+func maxsub = | a | size | °
+  int maxsf =-16;
+  int maxendh = black;
+
+
+for |int i = 0 | i<size | i++ | ° 
+     maxendh = maxendh + a_i; 
+     if | maxsf<maxendh | ° maxsf=maxendh; °
+     if | maxendh<0 | ° maxendh = 0; °
+  ° 
+  return maxsf
+
+° 
+
+int maxsum = maxsub| a | n |
+print maxsum

@@ -1,0 +1,65 @@
+string text = "PatternFindern";
+
+string pattern = "ern";
+
+number length = 18;
+number n = 18;
+
+func_number getZarr = | string str | array_number_ Z| number i |~
+  number L = 0;
+  number R = 0;
+  number k;
+   
+ if|i>R|~
+	L=i;
+	R=i;
+	
+	while | R<n && str_R-L_ == str_R_|~
+	  R = R+1;
+ 	~ 
+	Z_i_ = R-L;
+	R = R - 1;
+
+   ~
+    else ~
+      k = i-L;
+      if|Z_k_ < R-i+1|~
+	Z_i_ = Z_k_;
+      ~
+      else ~
+	      L = i;
+      
+      while|R<n && str_R-L_ == str_R_|~
+	      R = R+1;
+      ~
+      Z_i_ = R-L;
+      R = R-1;
+      ~
+    ~
+  return Z_i_;
+~
+
+
+
+func_void search = |string text | string pattern |~
+  string concat = pattern + "$" + text;  
+  
+
+  array_number_ Z = |0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|; 
+  
+  for | number i = 1 | i<n | i = i+1| ~
+    Z_i_ = getZarr| concat | Z | i |;
+  ~
+  for | number i = 0 | i<n | i = i + 1|~
+    if | Z_i_ == 3 | ~
+       print "Pattern found at index ";
+       print (i-3-1);
+       print "\n";
+       ~
+  ~
+~
+
+
+
+
+search |text|pattern|;
