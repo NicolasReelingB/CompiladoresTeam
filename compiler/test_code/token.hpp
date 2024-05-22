@@ -223,8 +223,8 @@ struct Token {
 
     std::string value = "";
 
-    int line;
-    int column;
+    int line = 1;
+    int column = 0;
 
     Token() {}
 

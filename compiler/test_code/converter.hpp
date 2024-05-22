@@ -168,18 +168,19 @@ struct Converter {
         return false;
     }
 
-    void matchDT(token::DataType& expDT) {
+    token::DataType matchDT(token::DataType& expDT, bool check = true) {
+        token::DataType& objDT = *dt;
+        std::string& name = *val;
         if (*type == token::Type::IDENTIFIER) {
             Id id = getLastId(*val);
-            dt = &id.dt;
-            st = &id.st;
+            *dt = id.dt;
+            *st = id.st;
 
             if (id.dep == -1) {
                 throwInvChar("Identifier not declared");
             }
         } 
 
-        std::string& name = *val;
         if (*dt == token::DataType::STRING) {
             lastI = i;
             i++;
@@ -201,10 +202,14 @@ struct Converter {
             printOut(name);
         }
 
-        if (*dt == token::STRING ^ expDT == token::STRING || (*dt == token::UNDEFINEDDT && *dt != expDT)) {
-            throwInvChar("Expected " + token::dataTypeToStr[expDT] + " value");
+        if (check) {
+            if (*dt == token::STRING ^ expDT == token::STRING || 
+            (*dt == token::UNDEFINEDDT && *dt != expDT)) {
+                throwInvChar("Expected " + token::dataTypeToStr[expDT] + " value");
+            }
         }
         
+        objDT = *dt;
         adv();
         if (*st == token::SubType::FUNCTION) {
             validateFuncCall(name);
@@ -212,6 +217,8 @@ struct Converter {
         else if (*st == token::SubType::ARRAY) {
             validateAccessArr();
         }
+
+        return objDT;
     }
 
     void matchType(token::Type expType, bool advance = true) {
@@ -359,7 +366,7 @@ struct Converter {
             matchVal(lim, print, 44);
         }
     }
-    
+
     void expression(
         std::string lim, 
         std::string print, 
@@ -435,23 +442,20 @@ struct Converter {
                 if (last == 2 && *dt == token::DataType::STRING) {
                     throwInvChar("Invalid operators for string");
                 }
-                
-                if (*type == token::Type::IDENTIFIER) {
-                    Id id = getLastId(*val);
-                    if (id.dep == -1) {
-                        throwInvChar("Identifier not declared");
-                    }
-                    
-                    objDT = id.dt;
-                }
-                else {
-                    objDT = *dt;
-                }
             }
             else if (last == 1) {
                 throwInvChar("Expected valid expression");
             }
 
+            getToken();
+            if (objDT == token::DataType::UNDEFINEDDT) {
+                objDT = matchDT(objDT, objDT != token::DataType::UNDEFINEDDT);
+            }
+            else {
+                matchDT(objDT);
+            }
+
+            last = 1;
             // lastI = i;
             // i++;
             // if (matchVal("%")) {
@@ -461,9 +465,6 @@ struct Converter {
             //     i = lastI;
             // }
 
-            getToken();
-            matchDT(objDT);
-            last = 1;
         }
 
         if (!matchVal(lim, print, 36)) {
@@ -504,6 +505,9 @@ struct Converter {
             matchVal("_", "", 44);
 
             getToken();
+            if (*st == token::ARRAY) {
+                throwInvChar("Array cannot be function return type");
+            }
             if (*type == token::Type::VOID) {
                 nameType = "void";
                 objDT = token::DataType::UNDEFINEDDT;
@@ -751,6 +755,8 @@ struct Converter {
     void convert(std::string& path) {
         len = (int) tokens.size();
         tokens.push_back(Token());
+        tokens.back().line = tokens[std::max(0, len - 1)].line;
+        tokens.back().column = tokens[std::max(0, len - 1)].column + 1;
         
         fileOut.open(path);
         

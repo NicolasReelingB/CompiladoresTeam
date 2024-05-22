@@ -3,6 +3,7 @@ string text = "PatternFindern";
 string pattern = "ern";
 
 number lenght = 18;
+number n = 18;
 
 func_void getZarr = | string str | array_number_ Z|~
   number L = 0;
@@ -18,7 +19,7 @@ func_void getZarr = | string str | array_number_ Z|~
 	  R = R+1;
  	~ 
 	Z_i_ = R-L;
-	R--;
+	R = R - 1;
 
    ~
     else ~
@@ -49,13 +50,14 @@ func_void search = |string text | string pattern |~
 
   getZarr| concat | Z |;
   for | number i = 0 | i<1 | i = i + 1|~
-    if | Z_i_ == lenght | 
+    if | Z_i_ == lenght | ~
        print "Pattern found at index ";
        print (i-lenght-1);
+       ~
   ~
 ~
 
 
 
 
-search |text|pattern|
+search |text|pattern|;
