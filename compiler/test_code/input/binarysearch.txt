@@ -16,12 +16,17 @@ func_number binarySearch = |array_number_ arr | number low | number high | numbe
     ~
 ~
 
-number result = binarySearch|arr| 0| n - 1| query|;
-if |result % 1 == 0.5 |~
-        result = result - 0.5;
+
+number result = binarySearch| arr | 0 | n - 1 | query|;
+if |result == -1|~
         print "Element is not present in array";
+  ~
+else  ~ 
+   print "Element is present at index ";
+   number temp = result;
+   while |temp > 0 | ~ 
+	temp = temp-1;
+    ~
+   result = result+temp;
+   print result;
 ~
-    else ~
-         print "Element is present at index ";
-	 print result;
-         ~
