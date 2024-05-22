@@ -9,6 +9,7 @@
 #include <cassert>
 
 #include "token.hpp"
+#include "tokenHex.hpp"
 
 struct Lexical {
     std::vector<Token> tokens;
@@ -165,50 +166,50 @@ struct Lexical {
         }
     }
 
-    std::vector<Token>& tokenize(std::string& path) {
+    std::vector<Token>& tokenize(std::vector<std::vector<std::string>> hex) {
         reset();
+        
+        std::map<std::string, std::pair<std::string, token::Type>> keywordHex;
+        for (int i = 0; i < tokenH::keywordsToCode.size(); i++) {
+            std::map<std::string, std::string>& m = tokenH::keywordsToCode[i].mapToCode;
+            for (const auto &[color, key] : m) {
+                keywordHex[color] = std::make_pair(key, tokenH::keywordsToCode[i].type);
+            }
+        }
 
         for (int i = 0; i < token::keywordsToHex.size(); i++) {
-            std::map<std::string, std::string> &m = token::keywordsToHex[i].mapToHex;
+            std::map<std::string, std::string>& m = token::keywordsToHex[i].mapToHex;
             for (const auto &[key, color] : m) {
                 keyword[key] = std::make_pair(color, token::keywordsToHex[i].type);
             }
         }
 
-        std::ifstream file(path);
-        if (!file.is_open()) {
-            throw std::invalid_argument("File not found");
-        }
-
-        std::string line;
         int numLine = 0;
 
         int state = 0;
-        std::vector<std::string> lines;
-        while (std::getline(file, line)) {          
-            if (line.find('\t') != std::string::npos) {
-                std::string newLine = "";
-                for (int i = 0; i < (int) line.size(); ++i) {
-                    char c = line[i];
-                    if (c == '\t') {
-                        newLine += "    ";
-                    }
-                    else {
-                        newLine += c;
-                    }
-                }
+        std::vector<std::string> lines, lineHexs;
+        for (int i = 0; i < (int) hex.size(); ++i) {
+            numLine += 1;
+            std::string line = "";
+            std::string lineHex = "";
 
-                line = newLine;
+            for (const std::string& h : hex[i]) {
+                lineHex += h + " ";
+                if (!keywordHex.count(h)) {
+                    line += h;
+                }
+                else {
+                    line += keywordHex[h].first;
+                }
             }
 
-            numLine += 1;
             std::cout << numLine << ' ' << line << '\n';
+            std::cout << numLine << ' ' << lineHex << '\n' << '\n';
             lines.push_back(std::to_string(numLine) + " " + line);
+            lineHexs.push_back(std::to_string(numLine) + " " + lineHex);
             
             tokenizeLine(line, numLine, state);
         }
-
-        file.close();
 
         std::cout << '\n';
         int maxSize = std::max_element(tokens.begin(), tokens.end(), [&](Token &a, Token &b) {
@@ -219,7 +220,6 @@ struct Lexical {
         int maxType = token::typeToStr[std::max_element(tokens.begin(), tokens.end(), [&](Token &a, Token &b) {
             return token::typeToStr[a.type].size() < token::typeToStr[b.type].size();
         }) -> type].size();
-
 
         for (auto &token : tokens) {
             std::cout << std::setw(maxSize) << std::right <<  token.value << ' ';
@@ -234,7 +234,6 @@ struct Lexical {
         }
         std::cout << '\n';
         
-
         return tokens;
     }
 };

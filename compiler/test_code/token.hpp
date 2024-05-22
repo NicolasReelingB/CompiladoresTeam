@@ -72,7 +72,6 @@ namespace token {
         {DataType::CHAR, "CHAR"},
         {DataType::STRING, "STRING"},
         {DataType::NUMBER, "NUMBER"},
-        {DataType::UNDEFINEDDT, "UNDEFINED"}
     };
 
     struct MapToHex {

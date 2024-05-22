@@ -1,3 +1,5 @@
+#pragma once
+
 #include <map>
 #include <string>
 #include <vector>
@@ -13,21 +15,19 @@ namespace token {
         DATA,
         DATATYPE,
         DELIMITATION,
-        FUNCTION,
-        LOGICAL,
-        LOOP,
         IDENTIFIER,
         INPUT,
-        OUTPUT,
-        VOID,
-        WHITESPACE,
-        RETURN,
+        LOGICAL,
+        LOOP,
         OP,
-        SUBTYPE
+        OUTPUT,
+        RETURN,
+        SUBTYPE,
+        VOID,
+        WHITESPACE
     };
 
     std::map<Type, std::string> typeToStr = {
-        {Type::UNDEFINEDT, "UNDEFINED"},
         {Type::ARITHMETIC, "ARITHMETIC"},
         {Type::ARRAYOP, "ARRAYOP"},
         {Type::ASSIGNMENT, "ASSIGNMENT"},
@@ -36,17 +36,16 @@ namespace token {
         {Type::DATA, "DATA"},
         {Type::DATATYPE, "DATATYPE"},
         {Type::DELIMITATION, "DELIMITATION"},
-        {Type::FUNCTION, "FUNCTION"},
         {Type::LOGICAL, "LOGICAL"},
         {Type::LOOP, "LOOP"},
         {Type::IDENTIFIER, "IDENTIFIER"},
         {Type::INPUT, "INPUT"},
-        {Type::OUTPUT, "OUTPUT"},
-        {Type::VOID, "VOID"},
-        {Type::WHITESPACE, "WHITESPACE"},
-        {Type::RETURN, "RETURN"},
         {Type::OP, "OP"},
-        {Type::SUBTYPE, "SUBTYPE"}
+        {Type::OUTPUT, "OUTPUT"},
+        {Type::RETURN, "RETURN"},
+        {Type::SUBTYPE, "SUBTYPE"},
+        {Type::VOID, "VOID"},
+        {Type::WHITESPACE, "WHITESPACE"}
     };
 
     enum SubType {
@@ -56,7 +55,6 @@ namespace token {
     };
 
     std::map<SubType, std::string> subTypeToStr = {
-        {SubType::UNDEFINEDST, "UNDEFINED"},
         {SubType::ARRAY, "ARRAY"},
         {SubType::FUNCTION, "FUNCTION"}
     };
@@ -70,149 +68,150 @@ namespace token {
     };
 
     std::map<DataType, std::string> dataTypeToStr = {
-        {DataType::UNDEFINEDDT, "UNDEFINED"},
         {DataType::BOOL, "BOOL"},
         {DataType::CHAR, "CHAR"},
         {DataType::STRING, "STRING"},
-        {DataType::NUMBER, "NUMBER"}
+        {DataType::NUMBER, "NUMBER"},
     };
 
-    struct MapToCode {
-        std::map<std::string, std::string> mapToCode;
+    struct MapToHex {
+        std::map<std::string, std::string> mapToHex;
         Type type;
 
-        MapToCode(std::map<std::string, std::string> mapToCode, Type type) : 
-            mapToCode(mapToCode), 
+        MapToHex(std::map<std::string, std::string> mapToHex, Type type) : 
+            mapToHex(mapToHex), 
             type(type) 
             {}
     };
 
     std::map<std::string, std::string> arithmetic = {
-        {"FFAADD", "+"},
-        {"FFAAAA", "-"},
-        {"FFAA77", "*"},
-        {"FFAA44", "/"},
-        {"FF8811", "%"}
-    };
-
-    std::map<std::string, std::string> arrayOp = {
-        {"ABCD0E", "_"}
+        {"+", "FFAADD"},
+        {"-", "FFAAAA"},
+        {"*", "FFAA77"},
+        {"/", "FFAA44"},
+        {"%", "FF8811"}
     };
 
     std::map<std::string, std::string> assignment = {
-        {"FF5511", "="}
+        {"=", "FF5511"}
     };
 
     std::map<std::string, std::string> boolean = {
-        {"50C878", "true"},
-        {"F62217", "false"}
+        {"true", "50C878"},
+        {"false", "F62217"}
     };
 
     std::map<std::string, std::string> conditional = {
-        {"33FF77", "if"},
-        {"33FF44", "else"}
+        {"if", "33FF77"},
+        {"else", "33FF44"}
     };
 
     std::map<std::string, std::string> comparison = {
-        {"AAFFFF", "=="},
-        {"AACCCC", "!="},
-        {"AA1111", "<"},
-        {"AA5555", ">"},
-        {"FA1111", "<="},
-        {"FA5555", ">="}
+        {"==", "AAFFFF"},
+        {"!=", "AACCCC"},
+        {"<", "AA1111"},
+        {">", "AA5555"},
+        {"<=", "FA1111"},
+        {">=", "FA5555"}
     };
 
     std::map<std::string, std::string> dataType = {
-        {"FF0000", "char"},
-        {"0000FF", "number"},
-        {"00FF00", "bool"},
-        {"00FFFF", "array"},
-        {"FFFF00", "string"},
-        {"FF00FF", "func"},
-        {"FF00FF", "function"}
+        {"char", "FF0000"},
+        {"number", "0000FF"},
+        {"bool", "00FF00"},
+        {"array", "00FFFF"},
+        {"string", "FFFF00"},
+        {"func", "FF00FF"},
+        {"function", "FF00FF"}
     };
 
     std::map<std::string, std::string> delimitation = {
-        {"2BB2FF", "("},
-        {"FF7B2B", ")"},
-        {"40CCB0", "|"},
-        {"4AEEB3", "~"},
-        {"FFD37C", "\""},
-        {"FF5353", ";"}
-    };
-
-    std::map<std::string, std::string> function = {
-        {"BC7FFF", "return"}
+        {"(", "2BB2FF"},
+        {")", "FF7B2B"},
+        {"|", "40CCB0"},
+        {"~", "4AEEB3"},
+        {"\"", "FFD37C"},
+        {";", "FF5353"}
     };
 
     std::map<std::string, std::string> input = {
-        {"6A09B0", "read"}
+        {"read", "6A09B0"},
+    };
+
+    std::map<std::string, std::string> isReturn = {
+        {"return", "BC7FFF"}
     };
 
     std::map<std::string, std::string> isVoid = {
-        {"000000", "$"}
+        {"void", "000000"},
+        {"$", "000000"}
     };
     
     std::map<std::string, std::string> loop = {
-        {"33FFDD", "for"},
-        {"33FFAA", "while"}
+        {"for", "33FFDD"},
+        {"while", "33FFAA"}
     };
     
     std::map<std::string, std::string> logical = {
-        {"CC33FF", "&&"},
-        {"FFFF55", "||"},
-        {"FFD0D0", "!"},
-        {"AAFFFF", "=="},
-        {"AACCCC", "!="},
-        {"AA1111", "<"},
-        {"AA5555", ">"}
+        {"&&", "CC33FF"},
+        {"||", "FFFF55"},
+        {"!", "FFD0D0"},
+        {"==", "AAFFFF"},
+        {"!=", "AACCCC"},
+        {"<", "AA1111"},
+        {">", "AA5555"}
     };
 
     std::map<std::string, std::string> number = {
-        {"0000FE", "0"},
-        {"0000EE", "1"},
-        {"0000DD", "2"},
-        {"0000CC", "3"},
-        {"0000BB", "4"},
-        {"0000AA", "5"},
-        {"000099", "6"},
-        {"000088", "7"},
-        {"000077", "8"},
-        {"000066", "9"},
-        {"000033", "."}
+        {"0", "0000FE"},
+        {"1", "0000EE"},
+        {"2", "0000DD"},
+        {"3", "0000CC"},
+        {"4", "0000BB"},
+        {"5", "0000AA"},
+        {"6", "000099"},
+        {"7", "000088"},
+        {"8", "000077"},
+        {"9", "000066"},
+        {".", "000033"}
     };
 
     std::map<std::string, std::string> output = {
-        {"2024AB", "print"}
+        {"print", "2024AB"}
+    };
+
+    std::map<std::string, std::string> op = {
+        {"_", "ABCD0E"}
     };
 
     std::map<std::string, std::string> subTypes = {
-        {"00FFFF", "array"},
-        {"FF00FF", "func"},
-        {"FF00FF", "function"}
+        {"array", "00FFFF"},
+        {"func", "FF00FF"},
+        {"function", "FF00FF"}
     };
 
     std::map<std::string, std::string> whitespace = {
-        {"FFFFFF", " "}
+        {" ", "FFFFFF"}
     };
 
-    std::vector<MapToCode> keywordsToCode = {
-        MapToCode(arithmetic, ARITHMETIC),
-        MapToCode(arrayOp, ARRAYOP),
-        MapToCode(assignment, ASSIGNMENT),
-        MapToCode(boolean, DATA),
-        MapToCode(conditional, CONDITIONAL),
-        MapToCode(comparison, COMPARISON),
-        MapToCode(dataType, DATATYPE),
-        MapToCode(delimitation, DELIMITATION),
-        MapToCode(input, INPUT),
-        MapToCode(isVoid, VOID),
-        MapToCode(loop, LOOP),
-        MapToCode(logical, LOGICAL),
-        MapToCode(number, DATA),
-        MapToCode(output, OUTPUT),
-        MapToCode(whitespace, WHITESPACE),
-        MapToCode(subTypes, SUBTYPE)
+    std::vector<MapToHex> keywordsToHex = {
+        MapToHex(arithmetic, ARITHMETIC),
+        MapToHex(assignment, ASSIGNMENT),
+        MapToHex(boolean, DATA),
+        MapToHex(conditional, CONDITIONAL),
+        MapToHex(comparison, COMPARISON),
+        MapToHex(dataType, DATATYPE),
+        MapToHex(delimitation, DELIMITATION),
+        MapToHex(input, INPUT),
+        MapToHex(isReturn, RETURN),
+        MapToHex(isVoid, VOID),
+        MapToHex(loop, LOOP),
+        MapToHex(logical, LOGICAL),
+        MapToHex(number, DATA),
+        MapToHex(op, OP),
+        MapToHex(output, OUTPUT),
+        MapToHex(subTypes, SUBTYPE),
+        MapToHex(whitespace, WHITESPACE)
     };
 };
 
@@ -223,12 +222,12 @@ struct Token {
 
     std::string value = "";
 
-    int line;
-    int column;
+    int line = 1;
+    int column = 0;
 
     Token() {}
 
-    Token(token::Type type, std::string value, int line, int column) : 
+    Token(token::Type type, std::string value,  int line, int column) : 
         type(type), 
         value(value), 
         line(line), 
