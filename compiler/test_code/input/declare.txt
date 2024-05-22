@@ -8,6 +8,7 @@ bool g   ;
 number h ;
 array_string i;
 array_bool j = ||;
+array_number aaa;
 
 array_string k = i;
 

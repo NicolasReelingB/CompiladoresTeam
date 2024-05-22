@@ -179,18 +179,32 @@ struct Converter {
             }
         } 
 
-        if (*dt == token::STRING ^ expDT == token::STRING || (*dt == token::UNDEFINEDDT && *dt != expDT)) {
-            throwInvChar("Expected " + token::dataTypeToStr[expDT] + " value");
-        }
-
         std::string& name = *val;
         if (*dt == token::DataType::STRING) {
-            printOut("std::string(" + name + ")");
+            lastI = i;
+            i++;
+            if (matchVal("_")) {
+                printOut(name);
+
+                i = lastI + 1;
+                validateAccessArr();
+                *dt = token::DataType::NUMBER;
+                i--;
+            }
+            else {
+                i = lastI;
+                printOut("std::string(" + name + ")");
+                *dt = token::DataType::STRING;
+            }
         }
         else {
             printOut(name);
         }
 
+        if (*dt == token::STRING ^ expDT == token::STRING || (*dt == token::UNDEFINEDDT && *dt != expDT)) {
+            throwInvChar("Expected " + token::dataTypeToStr[expDT] + " value");
+        }
+        
         adv();
         if (*st == token::SubType::FUNCTION) {
             validateFuncCall(name);
@@ -406,8 +420,12 @@ struct Converter {
             if (last == 0 || last == 2) {
                 throwInvChar("Invalid operator");
             }
+            // if (*val != "%") {
+            //     printOut(*val);
+            // }
 
             printOut(*val);
+
             adv();
             expression(lim, print, objDT, token::DataType::NUMBER, 2);
             return;
@@ -434,6 +452,16 @@ struct Converter {
                 throwInvChar("Expected valid expression");
             }
 
+            // lastI = i;
+            // i++;
+            // if (matchVal("%")) {
+            //     printOut("fmod(");
+            // }
+            // else {
+            //     i = lastI;
+            // }
+
+            getToken();
             matchDT(objDT);
             last = 1;
         }

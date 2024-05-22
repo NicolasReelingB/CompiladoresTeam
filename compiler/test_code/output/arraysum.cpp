@@ -9,7 +9,7 @@ int main() {
     
     
     
-    auto maxsub = [&] (auto&&maxsub, std::vector<long double> b , long double size2 ) -> long double {
+    auto maxsub = [&] (auto&& maxsub, std::vector<long double> b , long double size2 ) -> long double {
       long double maxsf =-16;
       long double maxendh = 0;
     

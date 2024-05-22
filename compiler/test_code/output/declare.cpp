@@ -4,7 +4,6 @@
 #include <vector>
 
 int main() {
-    std::cout << std::fixed;
     long double a = 0;
     long double b= 0;
     
@@ -15,6 +14,7 @@ int main() {
     long double h ;
     std::vector<std::string> i;
     std::vector<bool> j = {};
+    std::vector<long double> aaa;
     
     std::vector<std::string> k = i;
     

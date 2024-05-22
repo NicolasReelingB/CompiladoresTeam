@@ -64,11 +64,8 @@ struct Lexical {
                 else if (c == '\'') {
                     s = 5;
                 }
-                else if (std::isalpha(c) || keyword.count(std::string(1, c))) {
-                    s = 1;
-                }
                 else {
-                    throwInvChar(numLine, col, "Invalid character", std::string(1, c));
+                    s = 1;
                 }
 
                 if (s > 0) {
@@ -118,6 +115,11 @@ struct Lexical {
                         }
                     }
                     else {
+                        if (!std::isalpha(str[0])) {
+                            std::string msg = "Invalid character";
+                            throwInvChar(numLine, col, msg, std::string(str[0], 1));
+                        }
+
                         token::Type type = token::Type::IDENTIFIER;
                         tokens.push_back(Token(type, str, numLine, col - lenStr + 1));
                     }
