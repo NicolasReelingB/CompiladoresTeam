@@ -24,9 +24,8 @@ if |result == -1|~
 else  ~ 
    print "Element is present at index ";
    number temp = result;
-   while |temp > 0 | ~ 
-	temp = temp-1;
-    ~
-   result = result+temp;
+   if |result%(2 + 4 - ((2.5 % ((5 +2.5 % 1 == 0))) == 2) - (4 + (2 - 2))) ==0.5| ~
+        result = result + 0.5;
+   ~
    print result;
 ~

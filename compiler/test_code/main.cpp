@@ -12,8 +12,8 @@ int main() {
     // compiler.compileBitmap("input/fib_recursive.txt");
     // compiler.compileBitmap("input/fibonacci_nonrecursive.txt");
     // compiler.compileBitmap("input/helloworld.txt");
-    // compiler.compileBitmap("input/binarysearch.txt");
-    compiler.compileBitmap("input/Z_algorithm.txt");
+    compiler.compileBitmap("input/binarysearch.txt");
+    // compiler.compileBitmap("input/Z_algorithm.txt");
     
     int a = 0;
     --++--++a = a++ +! -+-!!-+-3;

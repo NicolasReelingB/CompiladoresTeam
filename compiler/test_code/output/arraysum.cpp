@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 
 int main() {
     std::vector<long double> a = { -2 , -3 , -4 };

@@ -168,7 +168,7 @@ struct Converter {
         return false;
     }
 
-    token::DataType matchDT(token::DataType& expDT, bool check = true) {
+    token::DataType matchDT(token::DataType expDT, bool check = true, bool advance = true) {
         token::DataType& objDT = *dt;
         std::string& name = *val;
         if (*type == token::Type::IDENTIFIER) {
@@ -210,7 +210,10 @@ struct Converter {
         }
         
         objDT = *dt;
-        adv();
+        if (advance) {
+            adv();
+        }
+
         if (*st == token::SubType::FUNCTION) {
             validateFuncCall(name);
         }
@@ -427,15 +430,26 @@ struct Converter {
             if (last == 0 || last == 2) {
                 throwInvChar("Invalid operator");
             }
-            // if (*val != "%") {
-            //     printOut(*val);
-            // }
 
-            printOut(*val);
+            if (matchVal("%", ",", 36)) {
+                if (matchVal("(", "(", 36)) {
+                    expression(")", "))", token::DataType::NUMBER);
+                }
+                else {
+                    matchDT(token::DataType::NUMBER, true, false);
+                    printOut(")");
+                    adv();
+                }
 
-            adv();
-            expression(lim, print, objDT, token::DataType::NUMBER, 2);
-            return;
+                last = 1;
+            }
+            else {
+                printOut(*val);
+
+                adv();
+                expression(lim, print, objDT, token::DataType::NUMBER, 2);
+                return;
+            }
         }
         else {
             if (last != 1 && objDT == token::DataType::UNDEFINEDDT) {
@@ -447,24 +461,23 @@ struct Converter {
                 throwInvChar("Expected valid expression");
             }
 
+            lastI = i;
+            i++;
+            if (matchVal("%")) {
+                printOut("std::fmod(");
+            }
+
+            i = lastI;
+
             getToken();
             if (objDT == token::DataType::UNDEFINEDDT) {
-                objDT = matchDT(objDT, objDT != token::DataType::UNDEFINEDDT);
+                objDT = matchDT(objDT, false);
             }
             else {
                 matchDT(objDT);
             }
 
             last = 1;
-            // lastI = i;
-            // i++;
-            // if (matchVal("%")) {
-            //     printOut("fmod(");
-            // }
-            // else {
-            //     i = lastI;
-            // }
-
         }
 
         if (!matchVal(lim, print, 36)) {
