@@ -188,6 +188,7 @@ struct Lexical {
 
         int state = 0;
         std::vector<std::string> lines, lineHexs;
+        std::stringstream ss;
         for (int i = 0; i < (int) hex.size(); ++i) {
             numLine += 1;
             std::string line = "";
@@ -196,7 +197,21 @@ struct Lexical {
             for (const std::string& h : hex[i]) {
                 lineHex += h + " ";
                 if (!keywordHex.count(h)) {
-                    line += h;
+                    std::string firstTwo = h.substr(0, 2);
+                    std::string lastFour = h.substr(2, 4);
+                    ss << std::hex << firstTwo;
+                    
+                    int num;
+                    ss >> num;
+                    ss.clear();
+
+                    if (lastFour == "0000" && num >= 64 && num <= 252) {
+                        char cc = (char) (num / 2);
+                        line += (char) (num / 2);
+                    }
+                    else {
+                        line += h;
+                    }
                 }
                 else {
                     line += keywordHex[h].first;
