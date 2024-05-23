@@ -24,6 +24,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@tauri-apps/api": "^1.5.6"
+		"@lukeed/uuid": "^2.0.1",
+		"@tauri-apps/api": "^1.5.6",
+		"svelte-awesome-color-picker": "^3.1.0",
+		"svelte-color-picker": "^1.0.7"
 	}
 }

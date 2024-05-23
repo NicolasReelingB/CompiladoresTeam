@@ -1,5 +1,7 @@
 <script>
     import ColorPicker from '$lib/ColorPicker.svelte';
+    import ColorPalette from "$lib/ColorPalette.svelte";
+    import AnimatedBackground from "$lib/AnimatedBackground.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
   
     let width = 5;
@@ -120,6 +122,7 @@
 </script>
   
   <style>
+
     .container {
       display: flex;
       flex-direction: column;
@@ -129,23 +132,37 @@
     }
   
     .grid {
+      margin-top: 1em;
       display: grid;
-      grid-template-columns: repeat(var(--width), 50px); /* dynamic number of columns based on width */
-      grid-gap: 10px;
+      grid-template-columns: repeat(var(--width), 28px); /* dynamic number of columns based on width */
+      grid-gap: 0;
       justify-content: center; /* center the grid horizontally */
+      background-color: #8f8f8f;
+
     }
   
-    input[type="number"], button {
-      margin: 0.5em;
+    input[type="range"], button {
+      margin-left: 2em;
     }
+    label{
+      background-color: #cecece;
+      padding: 15px ;
+      border-radius: 20px;
+
+    }
+    :root{
+      font-family: "Bauhaus 93"!important;
+    }
+
   </style>
-  
+<AnimatedBackground/>
+
   <div class="container">
     <div>
       <label for="width">Width:</label>
-      <input id="width" type="number" bind:value={width} min="1" max="32">
+      <input id="width" type="range" bind:value={width} min="1" max="32">
       <label for="height">Height:</label>
-      <input id="height" type="number" bind:value={height} min="1" max="32">
+      <input id="height" type="range" bind:value={height} min="1" max="24">
       <button on:click={exportBitmap} on:click={() => downloadCppFile('test.cpp')}>Export Bitmap</button>
       <input type="file" accept=".bmp" on:change={handleFileChange}>
       <button on:click={compileAndRunCpp}>Compile cpp</button>
@@ -153,7 +170,7 @@
     <div class="grid" style="--width: {width};">
       {#each colors as row, x}
         {#each row as color, y}
-          <ColorPicker bind:color={colors[x][y]} on:change={(e) => handleColorChange(x, y, e)} />
+          <ColorPalette bind:color={colors[x][y]} on:click={(e) => handleColorChange(x, y, e)} />
         {/each}
       {/each}
     </div>

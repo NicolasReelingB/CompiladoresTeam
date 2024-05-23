@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8ef903de-ecd6-42f9-b98b-ca63f240f9d4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/svelte-Colors/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/svelte-Colors/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/svelte-Colors/src/lib/ColorPicker.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/src/lib/ColorPicker.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/svelte-Colors/src/routes/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/src/routes/+page.svelte" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="ColorPalette" />
+        <option value="TypeScript File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2gqD5771W6mvGTP0MIVNjvhEvIT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/santi/OneDrive/Documents/GitHub/CompiladoresTeam/svelte-Colors/src/lib&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\santi\\OneDrive\\Documents\\GitHub\\CompiladoresTeam\\svelte-Colors\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\santi\OneDrive\Documents\GitHub\CompiladoresTeam\svelte-Colors\src\lib" />
+      <recent name="C:\Users\santi\OneDrive\Documents\GitHub\CompiladoresTeam\svelte-Colors\src\lib\utils" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\santi\OneDrive\Documents\GitHub\CompiladoresTeam\svelte-Colors\src" />
+      <recent name="C:\Users\santi\OneDrive\Documents\GitHub\CompiladoresTeam\svelte-Colors\src\lib" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8ef903de-ecd6-42f9-b98b-ca63f240f9d4" name="Changes" comment="" />
+      <created>1716416033935</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1716416033935</updated>
+      <workItem from="1716416035801" duration="22242000" />
+      <workItem from="1716492112878" duration="5223000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/svelte-Colors/src/lib/AnimatedBackground.svelte</url>
+          <line>3</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
