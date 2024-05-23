@@ -13,9 +13,7 @@ struct Compiler {
     Converter converter;
 
     void compileBitmap(std::string out, std::vector<std::vector<std::string>> hex) {
-        std::vector<Token>& tokens = lexical.tokenize(hex);
-
-        converter.tokens = tokens;
+        converter.tokens = lexical.tokenize(hex);
         converter.convert(out);
     }
 };

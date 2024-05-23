@@ -3,7 +3,7 @@
     import ColorPalette from "$lib/ColorPalette.svelte";
     import AnimatedBackground from "$lib/AnimatedBackground.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
-  
+
     let width = 5;
     let height = 5;
     let colors = [];
@@ -19,27 +19,40 @@
     function handleColorChange(x, y, event) {
       colors[x][y] = event.detail.color;
     }
-  
-    function exportBitmap() {
-    const canvas = document.createElement('canvas');
-    canvas.width = width * 50;
-    canvas.height = height * 50;
-    const ctx = canvas.getContext('2d');
 
-    colors.forEach((row, x) => {
-      row.forEach((color, y) => {
-        ctx.fillStyle = color;
-        ctx.fillRect(y * 50, x * 50, 50, 50);
+    function removeHashes(matrix) {
+      return matrix.map(row => row.map(color => color.replace('#', '').toUpperCase()));
+    }
+
+    async function exportBitmap() {
+      const canvas = document.createElement('canvas');
+      canvas.width = width * 50;
+      canvas.height = height * 50;
+      const ctx = canvas.getContext('2d');
+
+      colors.forEach((row, x) => {
+        row.forEach((color, y) => {
+          ctx.fillStyle = color;
+          ctx.fillRect(y * 50, x * 50, 50, 50);
+        });
       });
-    });
 
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bitmap.bmp';
-      a.click();
-    });
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'main.bmp';
+        a.click();
+      });
+
+    let processedColors = removeHashes(colors);
+    console.log(processedColors)
+    try {
+      const response = await invoke('process_matrix', { matrix: processedColors });
+      console.log('Response from Rust:', response);
+    } catch (error) {
+      console.error('Error processing matrix:', error);
+    }
   }
 
   function handleFileChange(event) {
@@ -82,16 +95,23 @@
         };
 
         reader.readAsDataURL(file);
+
+        try {
+          const response = await invoke('process_matrix', { matrix: hexColors });
+          console.log('Response from Rust:', response);
+        } catch (error) {
+          console.error('Error processing matrix:', error);
+        }
     }
 
     function rgbToHex(r, g, b) {
-        return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        return ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
     }
 
 
-    let filePath = '../testfiles/test.cpp';
-    let outputPath = '../testfiles/test_code';
-    let output = '';
+  let filePath = '../../compiler/main.cpp';
+  let outputPath = '../../compiler/main';
+  let output = '';
 
   async function compileAndRunCpp() {
     try {
@@ -102,6 +122,8 @@
       output = 'An error occurred: ' + error;
     }
   }
+
+
 
   async function downloadCppFile(fileName) {
     try {
@@ -120,7 +142,7 @@
     }
   }
 </script>
-  
+
   <style>
 
     .container {
@@ -130,7 +152,7 @@
       justify-content: center;
       height: 100vh; /* Adjust height to take full viewport height */
     }
-  
+
     .grid {
       margin-top: 1em;
       display: grid;
@@ -140,9 +162,10 @@
       background-color: #8f8f8f;
 
     }
-  
+
     input[type="range"], button {
       margin-left: 2em;
+
     }
     label{
       background-color: #cecece;

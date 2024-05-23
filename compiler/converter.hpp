@@ -47,6 +47,7 @@ struct Converter {
 
     std::ofstream fileOut;
     bool newLine = true;
+    bool modPend = false;
 
     std::set<token::DataType> validDt = {
         token::DataType::BOOL, 
@@ -382,7 +383,14 @@ struct Converter {
                 throwInvChar("Invalid operator");
             }
             
-            expression(")", ")", objDT, tempDT, last);
+            if (modPend) {
+                modPend = false;
+                expression(")", "))", objDT, tempDT, last);
+            }
+            else {
+                expression(")", ")", objDT, tempDT, last);
+            }
+
             last = 1;
         }
         else if (matchVal("+", "+", 36)) {
@@ -431,25 +439,16 @@ struct Converter {
                 throwInvChar("Invalid operator");
             }
 
-            if (matchVal("%", ",", 36)) {
-                if (matchVal("(", "(", 36)) {
-                    expression(")", "))", token::DataType::NUMBER);
-                }
-                else {
-                    matchDT(token::DataType::NUMBER, true, false);
-                    printOut(")");
-                    adv();
-                }
-
-                last = 1;
+            if (matchVal("%", ",", 4)) {
+                modPend = true;
             }
             else {
                 printOut(*val);
-
-                adv();
-                expression(lim, print, objDT, token::DataType::NUMBER, 2);
-                return;
             }
+
+            adv();
+            expression(lim, print, objDT, token::DataType::NUMBER, 2);
+            return;
         }
         else {
             if (last != 1 && objDT == token::DataType::UNDEFINEDDT) {
@@ -475,6 +474,11 @@ struct Converter {
             }
             else {
                 matchDT(objDT);
+            }
+
+            if (modPend) {
+                modPend = false;
+                printOut(")");
             }
 
             last = 1;
@@ -771,7 +775,7 @@ struct Converter {
         tokens.back().line = tokens[std::max(0, len - 1)].line;
         tokens.back().column = tokens[std::max(0, len - 1)].column + 1;
         
-        fileOut.open(path);
+        fileOut.open(path, std::ofstream::out | std::ofstream::app);
         
         std::ifstream fileIn;
 
