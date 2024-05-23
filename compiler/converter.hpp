@@ -775,7 +775,7 @@ struct Converter {
         tokens.back().line = tokens[std::max(0, len - 1)].line;
         tokens.back().column = tokens[std::max(0, len - 1)].column + 1;
         
-        fileOut.open(path);
+        fileOut.open(path, std::ofstream::out | std::ofstream::app);
         
         std::ifstream fileIn;
 

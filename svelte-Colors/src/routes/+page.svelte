@@ -39,7 +39,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'bitmap.bmp';
+        a.download = 'main.bmp';
         a.click();
       });
 
@@ -93,6 +93,13 @@
         };
 
         reader.readAsDataURL(file);
+
+        try {
+          const response = await invoke('process_matrix', { matrix: hexColors });
+          console.log('Response from Rust:', response);
+        } catch (error) {
+          console.error('Error processing matrix:', error);
+        }
     }
 
     function rgbToHex(r, g, b) {
@@ -100,8 +107,8 @@
     }
 
 
-  let filePath = '../testfiles/test.cpp';
-  let outputPath = '../testfiles/test_code';
+  let filePath = '../../compiler/main.cpp';
+  let outputPath = '../../compiler/main';
   let output = '';
 
   async function compileAndRunCpp() {

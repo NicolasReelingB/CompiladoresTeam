@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     Compiler compiler;
     
-    std::string outFile = "output/main.cpp";
+    std::string outFile = "C:/Users/carlo/Documents/Github/CompiladoresTeam/compiler/output/main.cpp";
     compiler.compileBitmap(outFile, hex);
     
     return 0;
