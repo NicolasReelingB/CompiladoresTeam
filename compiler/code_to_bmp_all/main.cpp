@@ -5,7 +5,7 @@
 
 int main() {
     Lexical lexical;
-    lexical.tokenize("input/declare.txt");
+    lexical.tokenize("input/Z_algorithm.txt");
     
     return 0;
 }

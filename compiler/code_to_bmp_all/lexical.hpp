@@ -83,7 +83,7 @@ struct Lexical {
         
         int lenLine = line.size();
         for (int col = 1; col < lenLine; col++) {
-            char c = line[col];
+             char c = line[col];
             char nxt = line[std::min(col + 1, lenLine - 1)];
 
             str += c;
@@ -98,11 +98,8 @@ struct Lexical {
                 else if (c == '\'') {
                     s = 5;
                 }
-                else if (std::isalpha(c) || keyword.count(std::string(1, c))) {
-                    s = 1;
-                }
                 else {
-                    throwInvChar(numLine, col, "Invalid character");
+                    s = 1;
                 }
 
                 if (s > 0) {
@@ -115,6 +112,9 @@ struct Lexical {
                     if (col != lenLine - 1 && keyword.count(str + std::string(1, nxt))) {
                         continue;
                     }   
+                    if (col != lenLine - 1 && std::isalpha(str[0]) && std::isalnum(nxt)) {
+                        continue;
+                    }
                     
                     if (keyword.count(str)) {
                         auto &[color, type] = keyword[str];
