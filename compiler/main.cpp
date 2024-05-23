@@ -4,9 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-int main(int argc, char* argv[]) {
-    //std::vector<std::vector<std::string>> hex {{"00FFFF", "FFFFFF", "FF00FF"}, {"2024AB"}};
-    
+int main(int argc, char* argv[]) {    
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <matrix_file>" << std::endl;
         return 1;
