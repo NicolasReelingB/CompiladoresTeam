@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8ef903de-ecd6-42f9-b98b-ca63f240f9d4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/svelte-Colors/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/svelte-Colors/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/svelte-Colors/src/lib/ColorPicker.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/src/lib/ColorPicker.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/svelte-Colors/src/routes/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/svelte-Colors/src/routes/+page.svelte" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,6 +27,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2gqD5771W6mvGTP0MIVNjvhEvIT" />
   <component name="ProjectViewState">
@@ -70,6 +71,7 @@
       <updated>1716416033935</updated>
       <workItem from="1716416035801" duration="22242000" />
       <workItem from="1716492112878" duration="5223000" />
+      <workItem from="1716502728541" duration="244000" />
     </task>
     <servers />
   </component>

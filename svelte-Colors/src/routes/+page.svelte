@@ -1,5 +1,5 @@
-<script>
-    import ColorPicker from '$lib/ColorPicker.svelte';
+<script lang="ts">
+
     import ColorPalette from "$lib/ColorPalette.svelte";
     import AnimatedBackground from "$lib/AnimatedBackground.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
@@ -64,7 +64,7 @@
         }
     }
 
-  function readBitmap(file) {
+  async function readBitmap(file) {
         const reader = new FileReader();
 
         reader.onload = (e) => {
@@ -167,11 +167,23 @@
       margin-left: 2em;
 
     }
+    input[type="file"], button{
+      font-family: "Bauhaus 93";
+      padding: 5px;
+    }
     label{
       background-color: #cecece;
       padding: 15px ;
       border-radius: 20px;
 
+    }
+    textarea{
+      border-radius:  10px;
+    }
+    button{
+      border-radius: 10px;
+      padding: 5px;
+      font-family: "Bauhaus 93";
     }
     :root{
       font-family: "Bauhaus 93"!important;
@@ -185,7 +197,7 @@
       <label for="width">Width:</label>
       <input id="width" type="range" bind:value={width} min="1" max="32">
       <label for="height">Height:</label>
-      <input id="height" type="range" bind:value={height} min="1" max="24">
+      <input id="height" type="range" bind:value={height} min="1" max="16">
       <button on:click={exportBitmap} on:click={() => downloadCppFile('test.cpp')}>Export Bitmap</button>
       <input type="file" accept=".bmp" on:change={handleFileChange}>
       <button on:click={compileAndRunCpp}>Compile cpp</button>
@@ -197,4 +209,5 @@
         {/each}
       {/each}
     </div>
+    <textarea readonly/>
   </div>
