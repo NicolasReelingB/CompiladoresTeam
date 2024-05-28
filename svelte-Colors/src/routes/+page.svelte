@@ -3,11 +3,13 @@
     import ColorPalette from "$lib/ColorPalette.svelte";
     import AnimatedBackground from "$lib/AnimatedBackground.svelte";
     import { invoke } from '@tauri-apps/api/tauri';
+    import { read } from "$app/server";
 
     let width = 5;
     let height = 5;
     let colors = [];
     let hexColors = [];
+    let outputResponse = '';
 
     // Reactive statement to adjust the grid size based on width and height
     $: {
@@ -50,6 +52,7 @@
     try {
       const response = await invoke('process_matrix', { matrix: processedColors });
       console.log('Response from Rust:', response);
+      outputResponse = response;
     } catch (error) {
       console.error('Error processing matrix:', error);
     }
@@ -198,7 +201,7 @@
       <input id="width" type="range" bind:value={width} min="1" max="32">
       <label for="height">Height:</label>
       <input id="height" type="range" bind:value={height} min="1" max="16">
-      <button on:click={exportBitmap} on:click={() => downloadCppFile('test.cpp')}>Export Bitmap</button>
+      <button on:click={exportBitmap} on:click={() => downloadCppFile('main.cpp')}>Export Bitmap</button>
       <input type="file" accept=".bmp" on:change={handleFileChange}>
       <button on:click={compileAndRunCpp}>Compile cpp</button>
     </div>
@@ -209,5 +212,5 @@
         {/each}
       {/each}
     </div>
-    <textarea readonly/>
+    <textarea bind:value={outputResponse} readonly/>
   </div>
