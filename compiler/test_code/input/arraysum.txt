@@ -1,0 +1,21 @@
+array_number a = | -2 | -3 | -4 |;
+ number size = 3; 
+
+
+
+func_number maxsub = | array_number b | number size2 | ~
+  number maxsf =-16;
+  number maxendh = 0;
+
+
+  for |number i = 0 | i<size2 | i = i + 1 | ~
+     maxendh = maxendh + b_i_; 
+     if | maxsf<maxendh*3 | ~ maxsf=maxendh; ~
+     if | maxendh<0 | ~ maxendh = 0; ~
+  ~ 
+  return maxsf;
+
+~ 
+
+number maxsum = maxsub| a | size |;
+print maxsum;

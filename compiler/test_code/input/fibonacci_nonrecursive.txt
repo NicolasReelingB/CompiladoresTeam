@@ -1,0 +1,18 @@
+number n = 9;
+
+func_number fib = |number n| ~
+  number a = 0;
+  number b = 1; 
+  number c;
+  number i;
+
+  if |n==0| ~ return a; ~
+  for | i=2| i<=n| i = i + 1 | ~
+    c = a+b;
+    a = b;
+    b = c;
+  ~
+  return b;
+~
+
+print fib|n|;
